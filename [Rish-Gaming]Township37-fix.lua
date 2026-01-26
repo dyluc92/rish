@@ -670,7 +670,7 @@ function menuescolhas2(menu_tipo)
         MRT = gg.choice({
             "⚔️ • lives", "⚔️ • ball", "⚔️ • rockets",
             "⚔️ • bombs", "⚔️ • Jack Hammer", "⚔️ • Drill",
-            "⚔️ • Weight", "⚔️ • Fan", "⚔️ • energy minigame",
+            "⚔️ • Weight", "⚔️ • Fan", "⚔️ • energy adventure",
             "⚔️ • double", "❌ • Return"
         }, nil, "CHOOSE ONE OPTION")
         if MRT == nil then return end
@@ -682,8 +682,8 @@ function menuescolhas2(menu_tipo)
         if MRT == 6 then hack("p2drill") end
         if MRT == 7 then hack("p2weight") end
         if MRT == 8 then hack("p2fan") end
-        if MRT == 9 then hack("lm7") end
-        if MRT == 10 then menuescolhas2(1) end
+        if MRT == 9 then hack("energybiru") end
+        if MRT == 10 then hack("lm7") end
     elseif menu_tipo == 6 then
         MNF = gg.choice({
             "🍀 • XP (Wheat)", "📦 • City Market",
@@ -29182,6 +29182,15 @@ function hack(variacao)
         setd(0x18, "79746974h")
         setd(0x14, "6E456465h")
         setd(0x10, "6D69542Ch")
+    elseif variacao == "energybiru" then
+        setd(0x28, 0)
+        setd(0x2C, 50000)
+        setd(0x24, "00000000h")
+        setd(0x20, "00000079h")
+        setd(0x1C, "6772656Eh")
+        setd(0x18, "456E6F69h")
+        setd(0x14, "74696465h")
+        setd(0x10, "70786520h")
         ---- VANTAGEM HACK
     elseif variacao == "lv1" then
         setd(0x28, 0)

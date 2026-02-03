@@ -29184,7 +29184,7 @@ function hack(variacao)
         setd(0x10, "6D69542Ch")
     elseif variacao == "energybiru" then
         setd(0x28, 0)
-        setd(0x2C, 50000)
+        setd(0x2C, 10000)
         setd(0x24, "00000000h")
         setd(0x20, "00000079h")
         setd(0x1C, "6772656Eh")

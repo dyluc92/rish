@@ -1722,11 +1722,6 @@ local teks = {
 📆 Masa Aktif:
 ♾️ 1 tahun
 ──────────────────────────
-🔐 Cara Premium:
-➡️ Lakukan pembayaran via: -
-➡️ Salin ID Lisensi dan kirim ke penjual
-➡️ Aktivasi setelah pembayaran dikonfirmasi
-──────────────────────────
 📩 Hubungi Penjual:
 💬 Telegram: @a_nnour
 
@@ -1755,11 +1750,6 @@ local teks = {
 
 📆 Duration:
 ♾️ 1 YEARS Access
-──────────────────────────
-🔐 How to Get Premium:
-➡️ Make your payment via: –
-➡️ Copy your License ID and send it to the seller
-➡️ Activation will be processed after your payment is confirmed
 ──────────────────────────
 📩 Contact The Seller:
 💬 Telegram: @a_nnour

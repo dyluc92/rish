@@ -2080,7 +2080,7 @@ end
 function menue4()
     local title = banner
     local menu = gg.choice({
-        _("menu4_opt1_hackfree"), _("menu4_opt2_hackfree"),
+        _("menu4_opt2_hackfree"),
         _("menu4_opt3_hackfree"), _("menu4_opt4_hackfree"),
         _("menu4_opt5_hackfree"), _("menu4_opt6_hackfree"),
         _("menu_back_hackfree")
@@ -2089,7 +2089,7 @@ function menue4()
     if not menu then return end
 
     local actions = {
-        oder1, -- Helicopter T-Cash
+    
         oder2, -- Wheat EXP
         oder3, -- Factory Boxes
         oder4, -- Land Expansion
@@ -15590,10 +15590,13 @@ end
 function menu4()
     local title = banner
     local menu = gg.choice({
-        _("industry_boost_gamragam"), _("heli_tcash_gamragam"),
-        _("wheat_exp_menupenambah"), _("free_boxes_gamragam"),
-        _("build_no_tools_gamragam"), _("freeze_expansion_gamragam"),
-        _("unlimited_likes"), _("back_gamragam")
+        _("industry_boost_gamragam"),
+        _("heli_tcash_gamragam"),
+        _("wheat_exp_menupenambah"),
+        _("free_boxes_gamragam"),
+        _("build_no_tools_gamragam"),
+        _("freeze_expansion_gamragam"),
+        _("back_gamragam")
     }, nil, title)
 
     if menu == nil then
@@ -15612,15 +15615,13 @@ function menu4()
     elseif menu == 6 then
         other6()
     elseif menu == 7 then
-        other7()
-    elseif menu == 8 then
         Main()
     else
         return
     end
 
     -- 🔄 Balik ke menu kecuali saat ke Main()
-    if menu ~= 8 then
+    if menu ~= 7 then
         while true do
             if gg.isVisible(true) then
                 gg.setVisible(false)

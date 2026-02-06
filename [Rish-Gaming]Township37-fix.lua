@@ -3,7 +3,6 @@ gg.setVisible(false)
 function deleteFiles(files)
   local deleted = 0
   local notFound = 0
-
   for _, path in ipairs(files) do
     local f = io.open(path, "r")
     if f then
@@ -1731,8 +1730,7 @@ local teks = {
 📩 Hubungi Penjual:
 💬 Telegram: @a_nnour
 
-📢 Telegram Channel (Info & Update):
-📨 ｢dyluc｣ • Official Channel
+
 ]],
         en = [[
 ┏━━━━｢💎𝗣𝗥𝗘𝗠𝗜𝗨𝗠   𝗔𝗖𝗖𝗘𝗦𝗦💎｣━━━━┓
@@ -1767,7 +1765,7 @@ local teks = {
 💬 Telegram: @a_nnour
 
 📢 Telegram Channel (Info & Updates):
-📨 ｢dyluc｣ • Official Channel
+📨 ｢Rish｣ • Official Channel
 ]]
     },
     ["btn_back"] = {id = "❌ Kembali", en = "❌ Go Back"},
@@ -1789,7 +1787,7 @@ local teks = {
     ["about_msg"] = {
         id = [[
 ┏━━━━━━｢‼️𝗜𝗡𝗙𝗢    𝗡𝗔𝗦𝗞𝗔𝗛‼️｣━━━━━━┓
-┃📖Dyluc ꜱᴄʀɪᴘᴛ — ᴘᴀɴᴅᴜᴀɴ & ᴘᴇʀɪɴɢᴀᴛᴀɴ📖
+┃📖Rish ꜱᴄʀɪᴘᴛ — ᴘᴀɴᴅᴜᴀɴ & ᴘᴇʀɪɴɢᴀᴛᴀɴ📖
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 ⚠️ PERINGATAN PENTING
@@ -1821,7 +1819,7 @@ Terima kasih sudah menggunakan rish Script. Gunakan secara bijak.
 ]],
         en = [[
 ┏━━━━｢‼️𝗦𝗖𝗥𝗜𝗣𝗧   𝗜𝗡𝗙𝗢‼️｣━━━━━┓
-┃📖Dyluc ꜱᴄʀɪᴘᴛ — ɢᴜɪᴅᴇ & ᴡᴀʀɴɪɴɢ📖
+┃📖Rish ꜱᴄʀɪᴘᴛ — ɢᴜɪᴅᴇ & ᴡᴀʀɴɪɴɢ📖
 ┗━━━━━━━━━━━━━━━━━━━━━━━┛
 
 ⚠️ IMPORTANT WARNING
@@ -16088,7 +16086,7 @@ function resetDataWithCode()
     gg.setVisible(false)
 
     -- 🔐 Kode yang diizinkan
-    local VALID_CODE = "dylucScript4826" -- ← ganti sesuai keinginanmu
+    local VALID_CODE = "RishScript4826" -- ← ganti sesuai keinginanmu
 
     -- 📥 Input kode
     local input = gg.prompt({"🔑 Enter the reset code:"}, nil, {"text"})

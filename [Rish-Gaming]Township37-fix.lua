@@ -2312,7 +2312,7 @@ function Main()
         if menu == 2 then
             menu1()
         elseif menu == 1 then
-            menuSpecial() -- 🔹 Fungsi untuk special hack
+            Regata() -- 🔹 Fungsi untuk special hack
         elseif menu == 3 then
             menu2()
         elseif menu == 4 then
@@ -4334,12 +4334,28 @@ function cardbadgecol(label, emoji, values)
 end
 
 function gp11()
+    local input = gg.prompt(
+        {"Input Card Pack : example 15"},
+        {15},
+        {"number"}
+    )
+
+    if not input then
+        gg.toast("Dibatalkan")
+        return
+    end
+
+    local nilai = input[1]
+
     cardbadgecol("Card Pack Reward", "🎴", {
         {offset = 0x10, value = 1918976790},
-        {offset = 0x14, value = 1348420452}, {offset = 0x18, value = 879453025},
-        {offset = 0x1C, value = 0}, {offset = 0x20, value = 0},
-        {offset = 0x24, value = 0}, {offset = 0x28, value = 0},
-        {offset = 0x2C, value = 74}
+        {offset = 0x14, value = 1348420452},
+        {offset = 0x18, value = 879453025},
+        {offset = 0x1C, value = 0},
+        {offset = 0x20, value = 0},
+        {offset = 0x24, value = 0},
+        {offset = 0x28, value = 0},
+        {offset = 0x2C, value = nilai}
     })
 end
 
@@ -16176,6 +16192,285 @@ function a2()
     progressBarLoading()
 end
 -- 🧹 Hapus file-file tertentu
+
+function Regata()
+
+    function lompat()
+        gg.setVisible(false)
+        gg.timeJump("00:01:00:00:00")
+
+    end
+    lompat()
+
+    gg.setVisible(false)
+    gg.clearResults()
+
+    function hilangkanTask2()
+
+        gg.searchNumber("1633121097", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1)
+
+        local res2 = gg.getResults(9999)
+        if #res2 > 0 then
+            for i, v in ipairs(res2) do
+                v.value = 0
+                v.freeze = true
+                v.flags = gg.TYPE_DWORD
+            end
+            gg.setValues(res2)
+            -- gg.addListItems(res2)
+        else
+            gg.toast("Tidak ada hasil untuk pencarian kedua.")
+        end
+
+        gg.clearResults()
+        -- 🔎 Bagian pertama
+        local searchString = "1701536084;1935758446;29547;10"
+        gg.searchNumber(searchString, gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1)
+        if gg.getResultCount() == 0 then
+            gg.toast("Tidak ada hasil pencarian awal.")
+        else
+            gg.refineNumber("1701536084", gg.TYPE_DWORD)
+            local results = gg.getResults(9999)
+
+            if #results > 0 then
+                local checkAddr = {}
+                for i, res in ipairs(results) do
+                    table.insert(checkAddr, {
+                        address = res.address - 0x4,
+                        flags = gg.TYPE_DWORD
+                    })
+                end
+                checkAddr = gg.getValues(checkAddr)
+
+                local edits = {}
+                for i, res in ipairs(results) do
+                    if checkAddr[i].value == 10 then
+                        table.insert(edits, {
+                            address = res.address,
+                            flags = gg.TYPE_DWORD,
+                            value = 0,
+                            freeze = true
+                        })
+                    end
+                end
+
+                if #edits > 0 then
+                    gg.setValues(edits)
+                    -- gg.addListItems(edits)
+                else
+                    gg.toast("Tidak ada hasil cocok (bagian pertama).")
+                end
+            end
+        end
+
+    end
+
+    local pilihanAktif = nil
+    local lastVisibleTime = 0
+
+   function HOME()
+    if pilihanAktif ~= nil then
+        matchXorAll(pilihanAktif)
+        return
+    end
+
+    local choice = gg.choice(
+        {"Points 150", "Points 250", "Points 300", "❌ Exit"},
+        nil,
+        "🔥 HACK BY RISH\nSilakan pilih jumlah points"
+    )
+
+    if choice == nil then return end
+
+    if choice == 1 then
+        pilihanAktif = 150
+        matchXorAll(pilihanAktif)
+        pilihanAktif = nil
+
+    elseif choice == 2 then
+        pilihanAktif = 250
+        matchXorAll(pilihanAktif)
+        pilihanAktif = nil
+
+    elseif choice == 3 then
+        pilihanAktif = 300
+        matchXorAll(pilihanAktif)
+        pilihanAktif = nil
+
+    elseif choice == 4 then
+        gg.toast("Keluar...")
+        gg.clearList()
+        gg.clearResults()
+        os.exit()
+    end
+end
+
+    function matchXorAll(target_value)
+
+        gg.clearResults()
+        gg.setRanges(gg.REGION_C_ALLOC)
+
+        -- Langkah 1: Search & Refine
+        gg.searchNumber("1702257942;1868526702;1919247474", gg.TYPE_DWORD)
+        gg.refineNumber("1702257942", gg.TYPE_DWORD)
+
+        local results = gg.getResults(9999)
+        local validResults = {}
+        local addList = {}
+        local editList = {}
+
+        -- Nilai valid untuk offset +0x30
+        local validOffset30 = {
+            [1952533772] = true,
+            [1886930198] = true,
+            [1919241496] = true
+        }
+
+        -- Nilai XOR yang dianggap valid
+        local validPoints = {}
+
+        -- Tambahkan angka dari 1 sampai 100
+        for i = 1, 100 do validPoints[i] = true end
+
+        -- Tambahkan angka dari 100 sampai 2000
+        for i = 100, 2000 do validPoints[i] = true end
+
+        -- Tambahkan angka-angka lainnya secara manual
+        local extraPoints = {
+            110, 120, 125, 130, 140, 150, 170, 300, 400, 500, 600, 700, 800,
+            900, 1000, 1100, 1150
+        }
+
+        for _, v in ipairs(extraPoints) do validPoints[v] = true end
+
+        for i, res in ipairs(results) do
+            local base = res.address
+
+            -- Ambil nilai dari offset +0x30
+            local val30 = gg.getValues({
+                {address = base + 0x30, flags = gg.TYPE_DWORD}
+            })[1].value
+
+            if validOffset30[val30] then
+                -- Lanjutkan proses XOR di offset +0x68 dan +0x6C
+                local offsets = {
+                    {address = base + 0x98, flags = gg.TYPE_DWORD},
+                    {address = base + 0x9C, flags = gg.TYPE_DWORD}
+                }
+
+                local values = gg.getValues(offsets)
+                local val1 = values[1].value
+                local val2 = values[2].value
+                local xorResult = bit32.bxor(val1, val2)
+
+                if validPoints[xorResult] then
+                    table.insert(validResults, res)
+
+                    -- table.insert(addList, {
+                    --     address = base + 0x98,
+                    --     flags = gg.TYPE_DWORD,
+                    --     value = val1,
+                    --     name = "Offset +98"
+                    -- })
+                    -- table.insert(addList, {
+                    --     address = base + 0x9C,
+                    --     flags = gg.TYPE_DWORD,
+                    --     value = val2,
+                    --     name = "Offset +9C"
+                    -- })
+
+                    table.insert(editList, {
+                        address = base + 0x98,
+                        flags = gg.TYPE_DWORD,
+                        value = 0
+                    })
+                    table.insert(editList, {
+                        address = base + 0x9C,
+                        flags = gg.TYPE_DWORD,
+                        value = 0
+                    })
+                end
+
+                -------------------------------------
+                -- BAGIAN 2: TAMBAHAN CEK POINTER +D8 --
+                -------------------------------------
+
+                local PointsRegata = {
+                    [50] = true,
+                    [70] = true,
+                    [75] = true,
+                    [80] = true,
+                    [85] = true,
+                    [90] = true,
+                    [95] = true,
+                    [100] = true,
+                    [105] = true,
+                    [110] = true,
+                    [115] = true,
+                    [120] = true,
+                    [125] = true,
+                    [130] = true,
+                    [135] = true,
+                    [140] = true,
+                    [150] = true
+                }
+
+                local pointerAddr = base + 0x120
+                local pointerData = gg.getValues({
+                    {address = pointerAddr, flags = gg.TYPE_QWORD}
+                })
+                local pointerValue = pointerData[1].value
+
+                if pointerValue ~= 0 and pointerValue > 0x10000 then
+                    local success, values =
+                        pcall(gg.getValues, {
+                            {address = pointerValue, flags = gg.TYPE_DWORD},
+                            {address = pointerValue + 4, flags = gg.TYPE_DWORD}
+                        })
+
+                    if success then
+                        local pval1 = values[1].value
+                        local pval2 = values[2].value
+                        local pxor = pval1 ~ pval2
+
+                        if PointsRegata[pxor] then
+                            table.insert(editList, {
+                                address = pointerValue,
+                                flags = gg.TYPE_DWORD,
+                                value = 0
+                            })
+                            table.insert(editList, {
+                                address = pointerValue + 4,
+                                flags = gg.TYPE_DWORD,
+                                value = target_value -- POINT REGATA
+                            })
+
+                        else
+
+                        end
+                    else
+
+                    end
+                else
+
+                end
+
+            end
+        end
+
+        if #validResults > 0 then
+            gg.loadResults(validResults)
+            gg.addListItems(addList)
+            gg.setValues(editList)
+            -- Jika ingin langsung ubah nilainya:
+            -- gg.setValues(editList)
+
+        else
+
+        end
+    end
+    HOME()
+end
 
 
 function exit()

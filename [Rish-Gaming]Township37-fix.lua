@@ -2423,7 +2423,7 @@ function gp1(caller)
         local check = gg.getValues({
             {address = res.address + 0x48, flags = gg.TYPE_DWORD}
         })
-        if check and check[1] and check[1].value == 690 then
+        if check and check[1] and check[1].value == 700 then
             table.insert(kandidat, res)
         end
     end
@@ -4348,7 +4348,7 @@ function gp11()
     local nilai = input[1]
 
     cardbadgecol("Card Pack Reward", "🎴", {
-        {offset = 0x10, value = 1918976790},
+        {offset = 0x10, value = 1918976},
         {offset = 0x14, value = 1348420452},
         {offset = 0x18, value = 879453025},
         {offset = 0x1C, value = 0},
@@ -8618,7 +8618,7 @@ local planeSkin = {
         offset0 = 49,
         offset8 = 27,
         values8 = {
-            1852402515, 1919500639, 1851878512, 1634230117, 2003790956,
+            1852402515, 1919500639, 1851878512, 1634230117, 2003956,
             846095717, 3224112, 536883254, 1869767700, 1952661872, 6649449, 0
         }
     },

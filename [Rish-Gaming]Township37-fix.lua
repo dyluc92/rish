@@ -14,7 +14,7 @@ function deleteFiles(files)
     end
   end
 
-  gg.toast("🧹 Cleanup done\n✔ Deleted: " .. deleted .. "\n✖ Not found: " .. notFound)
+  gg.toast("🧹 Cleanup done ✔")
 end
 local files = {
   "/sdcard/android/media/.com.android.sistem/.bin_xv",
@@ -2299,38 +2299,61 @@ function Main()
             loginOK = true
         end
 
-        local menu = gg.choice({
-            _("special_hack_premenu"), -- 🔹 Menu baru di atas limited_events
-            _("unlock_season_premenu"), _("limited_events_premenu"),
-            _("skip_time_premenu"), -- 🔹 Menu baru di bawah limited_events (sudah ada)
-            _("farming_products_premenu"), _("city_market_place"),
-            _("misc_mods_premenu"), _("script_info_premenu"),
-            _("exit_script_premenu")
-        }, nil, _("premium_menu_premenu"))
+       local menu = gg.choice({
+    _("special_hack_premenu"),
+    _("unlock_season_premenu"),
+    _("limited_events_premenu"),
+    _("skip_time_premenu"),
 
-        if menu == nil then break end
-        if menu == 2 then
-            menu1()
-        elseif menu == 1 then
-            Regata() -- 🔹 Fungsi untuk special hack
-        elseif menu == 3 then
-            menu2()
-        elseif menu == 4 then
-            menu7() -- 🔹 Skip waktu
-        elseif menu == 5 then
-            menu3()
-        elseif menu == 6 then
-            menumarketplace()
-        elseif menu == 7 then
-            menu4()
-        elseif menu == 8 then
-            menu6()
-        elseif menu == 9 then
-            exit()
-            menuRunning = false
-        else
-        end
-        break
+    "🚃📦 • XP Train",        -- 🔹 menu baru
+    "🚃📦 • Wheat Train",     -- 🔹 menu baru
+
+    _("farming_products_premenu"),
+    _("city_market_place"),
+    _("misc_mods_premenu"),
+    _("script_info_premenu"),
+    _("exit_script_premenu")
+}, nil, _("premium_menu_premenu"))
+
+if menu == nil then break end
+
+if menu == 2 then
+    menu1()
+
+elseif menu == 1 then
+    Regata()
+
+elseif menu == 3 then
+    menu2()
+
+elseif menu == 4 then
+    menu7() -- Skip time
+
+-- 🔥 MENU BARU
+elseif menu == 5 then
+    hackTrEn()
+
+elseif menu == 6 then
+    gandumkereta()
+
+-- menu lama digeser index
+elseif menu == 7 then
+    menu3()
+
+elseif menu == 8 then
+    menumarketplace()
+
+elseif menu == 9 then
+    menu4()
+
+elseif menu == 10 then
+    menu6()
+
+elseif menu == 11 then
+    exit()
+    menuRunning = false
+end
+break
     end
     menuRunning = false
 end
@@ -6555,6 +6578,3287 @@ function spesialdekor47() specialdecor(0xE8C, "Spicy House", "🌶️") end
 function spesialdekor48() specialdecor(0xEDC, "Grand Harvest Square", "🏛️") end
 function spesialdekor49() specialdecor(0xF2C, "Poseidon Statue", "🌊") end
 function spesialdekor50() specialdecor(0xF7C, "Treasure Chest", "💰") end
+
+
+
+
+
+
+
+
+function gandumkereta()
+    gg.clearResults()
+    gg.clearList()
+    gg.setVisible(false)
+    -- SEARCH BASE
+    gg.searchNumber("1701314560;1684368227;13663", gg.TYPE_DWORD)
+    gg.toast("Search selesai")
+
+    -- REFINE
+    gg.refineNumber("1701314560", gg.TYPE_DWORD)
+    gg.toast("Refine selesai")
+
+    -- SIMPAN BASE ADDRESS
+    local baseResults = gg.getResults(50)
+    if #baseResults == 0 then
+        gg.alert("❌ Base address tidak ditemukan")
+        os.exit()
+    end
+
+    --------------------------------------------------
+    -- PART 1 : TIMER FLOAT 1C8
+    --------------------------------------------------
+
+    local offset = 0x1C8
+
+    local MIN_TIME = 1800
+    local MAX_TIME = 18000
+    local MIN_TIME_ALT = 1
+    local MAX_TIME_ALT = 10
+
+    local readList = {}
+    for i, v in ipairs(baseResults) do
+        table.insert(readList,
+                     {address = v.address + offset, flags = gg.TYPE_FLOAT})
+    end
+
+    local values = gg.getValues(readList)
+
+    local function filterValues(minVal, maxVal, label)
+        local list = {}
+        for i, v in ipairs(values) do
+            if v.value >= minVal and v.value <= maxVal then
+                table.insert(list, {
+                    address = v.address,
+                    flags = gg.TYPE_FLOAT,
+                    value = 1,
+                    name = string.format(
+                        "FLOAT 1 | %s | Base 0x%X + 0x1C8 | Old: %.2f", label,
+                        baseResults[i].address, v.value)
+                })
+            end
+        end
+        return list
+    end
+
+    local editFloat = filterValues(MIN_TIME, MAX_TIME, "30m-5h")
+    if #editFloat == 0 then
+        gg.toast("⚠️ Tidak ketemu 30m-5h, coba 1-10 detik")
+        editFloat = filterValues(MIN_TIME_ALT, MAX_TIME_ALT, "1s-10s")
+    end
+
+    if #editFloat == 0 then
+        gg.alert("❌ Timer tidak ditemukan")
+        os.exit()
+    end
+
+    gg.setValues(editFloat)
+    gg.addListItems(editFloat)
+
+    ------------------------- baseResults sudah kamu dapat dari search sebelumnya
+
+    local gerbongOffsets = {-0x668, -0x540, -0x418, -0x2F0, -0x1C8}
+
+    local dwordValues = {1701345034, 1677751393, 13151, 0, 0, 0, 0, 1}
+    local editList = {}
+    local addList = {}
+
+    for _, base in ipairs(baseResults) do
+        local floatAddr = base.address + 0x1C8
+
+        -- FLOAT hanya untuk ditampilkan
+        table.insert(addList, {
+            address = floatAddr,
+            flags = gg.TYPE_FLOAT,
+            name = string.format("FLOAT", base.address)
+        })
+
+        for _, off in ipairs(gerbongOffsets) do
+            local startAddr = floatAddr + off
+
+            -- 8 DWORD
+            for i = 0, 7 do
+                table.insert(editList, {
+                    address = startAddr + (i * 4),
+                    flags = gg.TYPE_DWORD,
+                    value = dwordValues[i + 1],
+                    name = string.format("Gerbong", off,
+                                         i + 1)
+                })
+            end
+
+            -- +0x48 → 1
+            table.insert(editList, {
+                address = startAddr + 0x48,
+                flags = gg.TYPE_DWORD,
+                value = 1,
+                name = string.format("Gerbong", off)
+            })
+        end
+    end
+
+    -- hanya yang ada value saja yang di-set
+    gg.setValues(editList)
+
+    -- semua dimasukkan ke Address List
+    gg.addListItems(addList)
+    gg.addListItems(editList)
+
+    gg.toast(
+        "✅ Error hilang, karena semua setValues sekarang punya field 'value'")
+
+end
+
+-- hackTrEn
+function hackTrEn()
+    -- gg.alert("Make it more Start the game or restart the game...") 
+    gg.toast("Make it more Start the game or restart the game...")
+    -- gg.toast( "Loading...")
+    gg.processResume()
+    gg.clearResults()
+    gg.searchNumber("1600407924;51", gg.TYPE_DWORD)
+    gg.refineNumber("51", gg.TYPE_DWORD)
+    r = gg.getResults(1)
+    -- do something
+    local t = {}
+    t[1] = {}
+    t[1].address = r[1].address + 0x34 -- 782BF3ADBE80 + es abajo y x4 decimal 
+    t[1].flags = gg.TYPE_FLOAT
+    t[1].value = 3
+    t[1].freeze = false
+    gg.setValues(t)
+    -- 00000001h;6892D4F9h
+    -- 81x4 324 dec a hexa 144 - 4 = 140
+    local e = {}
+    e[1] = {}
+    e[1].address = r[1].address - 0x14C
+    e[1].flags = gg.TYPE_DWORD
+    e[1].value = 1
+    e[1].freeze = false
+    gg.setValues(e)
+
+    local y = {}
+    y[1] = {}
+    y[1].address = r[1].address - 0x148
+    y[1].flags = gg.TYPE_DWORD
+    y[1].value = 1754453241
+    y[1].freeze = false
+    gg.setValues(y)
+
+    local v = {}
+    v[1] = {}
+    v[1].address = r[1].address - 0x17C
+    v[1].flags = gg.TYPE_DWORD
+    v[1].value = 0
+    v[1].freeze = false
+    gg.setValues(v)
+
+    local h = {}
+    h[1] = {}
+    h[1].address = r[1].address - 0x178
+    h[1].flags = gg.TYPE_DWORD
+    h[1].value = 500
+    h[1].freeze = false
+    gg.setValues(h)
+    -- 1634296844 7169380 13407
+
+    local k_1 = {}
+    k_1[1] = {}
+    k_1[1].address = r[1].address - 0x194
+    k_1[1].flags = gg.TYPE_DWORD
+    k_1[1].value = 1634296844
+    k_1[1].freeze = false
+    gg.setValues(k_1)
+
+    local k_2 = {}
+    k_2[1] = {}
+    k_2[1].address = r[1].address - 0x190
+    k_2[1].flags = gg.TYPE_DWORD
+    k_2[1].value = 7169380
+    k_2[1].freeze = false
+    gg.setValues(k_2)
+
+    local k_3 = {}
+    k_3[1] = {}
+    k_3[1].address = r[1].address - 0x18C
+    k_3[1].flags = gg.TYPE_DWORD
+    k_3[1].value = 13407
+    k_3[1].freeze = false
+    gg.setValues(k_3)
+    local k_4 = {}
+    k_4[1] = {}
+    k_4[1].address = r[1].address - 0x188
+    k_4[1].flags = gg.TYPE_DWORD
+    k_4[1].value = 0
+    k_4[1].freeze = false
+    gg.setValues(k_4)
+
+    -- 1634296844 7169380 13407 0 valor 500 diadema
+
+    local e_1 = {}
+    e_1[1] = {}
+    e_1[1].address = r[1].address - 0x274
+    e_1[1].flags = gg.TYPE_DWORD
+    e_1[1].value = 1
+    e_1[1].freeze = false
+    gg.setValues(e_1)
+
+    local x_1 = {}
+    x_1[1] = {}
+    x_1[1].address = r[1].address - 0x270
+    x_1[1].flags = gg.TYPE_DWORD
+    x_1[1].value = 1754453241
+    x_1[1].freeze = false
+    gg.setValues(x_1)
+
+    local v_1 = {}
+    v_1[1] = {}
+    v_1[1].address = r[1].address - 0x2A4
+    v_1[1].flags = gg.TYPE_DWORD
+    v_1[1].value = 0
+    v_1[1].freeze = false
+    gg.setValues(v_1)
+
+    local w_1 = {}
+    w_1[1] = {}
+    w_1[1].address = r[1].address - 0x2A0
+    w_1[1].flags = gg.TYPE_DWORD
+    w_1[1].value = 500
+    w_1[1].freeze = false
+    gg.setValues(w_1)
+
+    ----1634296844 7169380 13407
+    local R_1 = {}
+    R_1[1] = {}
+    R_1[1].address = r[1].address - 0x2BC
+    R_1[1].flags = gg.TYPE_DWORD
+    R_1[1].value = 1634296844
+    R_1[1].freeze = false
+    gg.setValues(R_1)
+
+    local R_2 = {}
+    R_2[1] = {}
+    R_2[1].address = r[1].address - 0x2B8
+    R_2[1].flags = gg.TYPE_DWORD
+    R_2[1].value = 7169380
+    R_2[1].freeze = false
+    gg.setValues(R_2)
+
+    local R_3 = {}
+    R_3[1] = {}
+    R_3[1].address = r[1].address - 0x2B4
+    R_3[1].flags = gg.TYPE_DWORD
+    R_3[1].value = 13407
+    R_3[1].freeze = false
+    gg.setValues(R_3)
+
+    local R_4 = {}
+    R_4[1] = {}
+    R_4[1].address = r[1].address - 0x2B0
+    R_4[1].flags = gg.TYPE_DWORD
+    R_4[1].value = 0
+    R_4[1].freeze = false
+    gg.setValues(R_4)
+
+    --  
+
+    local e_2 = {}
+    e_2[1] = {}
+    e_2[1].address = r[1].address - 0x39C
+    e_2[1].flags = gg.TYPE_DWORD
+    e_2[1].value = 1
+    e_2[1].freeze = false
+    gg.setValues(e_2)
+
+    local x_2 = {}
+    x_2[1] = {}
+    x_2[1].address = r[1].address - 0x398
+    x_2[1].flags = gg.TYPE_DWORD
+    x_2[1].value = 1754453241
+    x_2[1].freeze = false
+    gg.setValues(x_2)
+
+    local v_2 = {}
+    v_2[1] = {}
+    v_2[1].address = r[1].address - 0x3CC
+    v_2[1].flags = gg.TYPE_DWORD
+    v_2[1].value = 0
+    v_2[1].freeze = false
+    gg.setValues(v_2)
+
+    local w_2 = {}
+    w_2[1] = {}
+    w_2[1].address = r[1].address - 0x3C8
+    w_2[1].flags = gg.TYPE_DWORD
+    w_2[1].value = 500
+    w_2[1].freeze = false
+    gg.setValues(w_2)
+    ----1634296844 7169380 13407
+    local H_1 = {}
+    H_1[1] = {}
+    H_1[1].address = r[1].address - 0x3E4
+    H_1[1].flags = gg.TYPE_DWORD
+    H_1[1].value = 1634296844
+    H_1[1].freeze = false
+    gg.setValues(H_1)
+
+    local H_2 = {}
+    H_2[1] = {}
+    H_2[1].address = r[1].address - 0x3E0
+    H_2[1].flags = gg.TYPE_DWORD
+    H_2[1].value = 7169380
+    H_2[1].freeze = false
+    gg.setValues(H_2)
+
+    local H_3 = {}
+    H_3[1] = {}
+    H_3[1].address = r[1].address - 0x3DC
+    H_3[1].flags = gg.TYPE_DWORD
+    H_3[1].value = 13407
+    H_3[1].freeze = false
+    gg.setValues(H_3)
+
+    local H_4 = {}
+    H_4[1] = {}
+    H_4[1].address = r[1].address - 0x3D8
+    H_4[1].flags = gg.TYPE_DWORD
+    H_4[1].value = 0
+    H_4[1].freeze = false
+    gg.setValues(R_4)
+
+    -- 1852404232 1953366119 7037696 1677747456 1694523753 28001 anillo 732 poner 550
+    local e_3 = {}
+    e_3[1] = {}
+    e_3[1].address = r[1].address - 0x4C4
+    e_3[1].flags = gg.TYPE_DWORD
+    e_3[1].value = 1
+    e_3[1].freeze = false
+    gg.setValues(e_3)
+
+    local x_3 = {}
+    x_3[1] = {}
+    x_3[1].address = r[1].address - 0x4C0
+    x_3[1].flags = gg.TYPE_DWORD
+    x_3[1].value = 1754453241
+    x_3[1].freeze = false
+    gg.setValues(x_3)
+
+    local v_3 = {}
+    v_3[1] = {}
+    v_3[1].address = r[1].address - 0x4F4
+    v_3[1].flags = gg.TYPE_DWORD
+    v_3[1].value = 0
+    v_3[1].freeze = false
+    gg.setValues(v_3)
+
+    local w_3 = {}
+    w_3[1] = {}
+    w_3[1].address = r[1].address - 0x4F0
+    w_3[1].flags = gg.TYPE_DWORD
+    w_3[1].value = 500
+    w_3[1].freeze = false
+    gg.setValues(w_3)
+    ------1634296844 7169380 13407
+    local Y_1 = {}
+    Y_1[1] = {}
+    Y_1[1].address = r[1].address - 0x50C
+    Y_1[1].flags = gg.TYPE_DWORD
+    Y_1[1].value = 1634296844
+    Y_1[1].freeze = false
+    gg.setValues(Y_1)
+
+    local Y_2 = {}
+    Y_2[1] = {}
+    Y_2[1].address = r[1].address - 0x508
+    Y_2[1].flags = gg.TYPE_DWORD
+    Y_2[1].value = 7169380
+    Y_2[1].freeze = false
+    gg.setValues(Y_2)
+
+    local Y_3 = {}
+    Y_3[1] = {}
+    Y_3[1].address = r[1].address - 0x504
+    Y_3[1].flags = gg.TYPE_DWORD
+    Y_3[1].value = 13407
+    Y_3[1].freeze = false
+    gg.setValues(Y_3)
+
+    local Y_4 = {}
+    Y_4[1] = {}
+    Y_4[1].address = r[1].address - 0x500
+    Y_4[1].flags = gg.TYPE_DWORD
+    Y_4[1].value = 0
+    Y_4[1].freeze = false
+    gg.setValues(Y_4)
+
+    local Y_5 = {}
+    Y_5[1] = {}
+    Y_5[1].address = r[1].address - 0x4FC
+    Y_5[1].flags = gg.TYPE_DWORD
+    Y_5[1].value = 0
+    Y_5[1].freeze = false
+    gg.setValues(Y_5)
+
+    local Y_6 = {}
+    Y_6[1] = {}
+    Y_6[1].address = r[1].address - 0x4F8
+    Y_6[1].flags = gg.TYPE_DWORD
+    Y_6[1].value = 0
+    Y_6[1].freeze = false
+    gg.setValues(Y_6)
+
+    --
+
+    local e_4 = {}
+    e_4[1] = {}
+    e_4[1].address = r[1].address - 0x5EC
+    e_4[1].flags = gg.TYPE_DWORD
+    e_4[1].value = 1
+    e_4[1].freeze = false
+    gg.setValues(e_4)
+
+    local x_4 = {}
+    x_4[1] = {}
+    x_4[1].address = r[1].address - 0x5E8
+    x_4[1].flags = gg.TYPE_DWORD
+    x_4[1].value = 1754453241
+    x_4[1].freeze = false
+    gg.setValues(x_4)
+
+    local v_4 = {}
+    v_4[1] = {}
+    v_4[1].address = r[1].address - 0x61C
+    v_4[1].flags = gg.TYPE_DWORD
+    v_4[1].value = 0
+    v_4[1].freeze = false
+    gg.setValues(v_4)
+
+    local w_4 = {}
+    w_4[1] = {}
+    w_4[1].address = r[1].address - 0x618
+    w_4[1].flags = gg.TYPE_DWORD
+    w_4[1].value = 500
+    w_4[1].freeze = false
+    gg.setValues(w_4)
+
+    ------1634296844 7169380 13407
+
+    local F_1 = {}
+    F_1[1] = {}
+    F_1[1].address = r[1].address - 0x634
+    F_1[1].flags = gg.TYPE_DWORD
+    F_1[1].value = 1634296844
+    F_1[1].freeze = false
+    gg.setValues(F_1)
+
+    local F_2 = {}
+    F_2[1] = {}
+    F_2[1].address = r[1].address - 0x630
+    F_2[1].flags = gg.TYPE_DWORD
+    F_2[1].value = 7169380
+    F_2[1].freeze = false
+    gg.setValues(F_2)
+
+    local F_3 = {}
+    F_3[1] = {}
+    F_3[1].address = r[1].address - 0x62C
+    F_3[1].flags = gg.TYPE_DWORD
+    F_3[1].value = 13407
+    F_3[1].freeze = false
+    gg.setValues(F_3)
+
+    local F_4 = {}
+    F_4[1] = {}
+    F_4[1].address = r[1].address - 0x628
+    F_4[1].flags = gg.TYPE_DWORD
+    F_4[1].value = 0
+    F_4[1].freeze = false
+    gg.setValues(F_4)
+
+    local F_5 = {}
+    F_5[1] = {}
+    F_5[1].address = r[1].address - 0x624
+    F_5[1].flags = gg.TYPE_DWORD
+    F_5[1].value = 0
+    F_5[1].freeze = false
+    gg.setValues(F_5)
+
+    local F_6 = {}
+    F_6[1] = {}
+    F_6[1].address = r[1].address - 0x620
+    F_6[1].flags = gg.TYPE_DWORD
+    F_6[1].value = 0
+    F_6[1].freeze = false
+    gg.setValues(F_6)
+
+    hackTrEn_XPUA()
+end
+
+function hackTrEn_XPUA()
+
+    -- gg.toast( "Cargando...")
+
+    r = gg.getResults(2)
+    -- do something
+    local t = {}
+    t[2] = {}
+    t[2].address = r[2].address + 0x34 -- 782BF3ADBE80 + es abajo y x4 decimal 
+    t[2].flags = gg.TYPE_FLOAT
+    t[2].value = 3
+    t[2].freeze = false
+    gg.setValues(t)
+    -- 00000001h;6892D4F9h
+    -- 81x4 324 dec a hexa 144 - 4 = 140
+    local e = {}
+    e[2] = {}
+    e[2].address = r[2].address - 0x14C
+    e[2].flags = gg.TYPE_DWORD
+    e[2].value = 1
+    e[2].freeze = false
+    gg.setValues(e)
+
+    local y = {}
+    y[2] = {}
+    y[2].address = r[2].address - 0x148
+    y[2].flags = gg.TYPE_DWORD
+    y[2].value = 1754453241
+    y[2].freeze = false
+    gg.setValues(y)
+
+    local v = {}
+    v[2] = {}
+    v[2].address = r[2].address - 0x17C
+    v[2].flags = gg.TYPE_DWORD
+    v[2].value = 0
+    v[2].freeze = false
+    gg.setValues(v)
+
+    local h = {}
+    h[2] = {}
+    h[2].address = r[2].address - 0x178
+    h[2].flags = gg.TYPE_DWORD
+    h[2].value = 500
+    h[2].freeze = false
+    gg.setValues(h)
+    -- 1634296844 7169380 13407
+
+    local k_1 = {}
+    k_1[2] = {}
+    k_1[2].address = r[2].address - 0x194
+    k_1[2].flags = gg.TYPE_DWORD
+    k_1[2].value = 1634296844
+    k_1[2].freeze = false
+    gg.setValues(k_1)
+
+    local k_2 = {}
+    k_2[2] = {}
+    k_2[2].address = r[2].address - 0x190
+    k_2[2].flags = gg.TYPE_DWORD
+    k_2[2].value = 7169380
+    k_2[2].freeze = false
+    gg.setValues(k_2)
+
+    local k_3 = {}
+    k_3[2] = {}
+    k_3[2].address = r[2].address - 0x18C
+    k_3[2].flags = gg.TYPE_DWORD
+    k_3[2].value = 13407
+    k_3[2].freeze = false
+    gg.setValues(k_3)
+    local k_4 = {}
+    k_4[2] = {}
+    k_4[2].address = r[2].address - 0x188
+    k_4[2].flags = gg.TYPE_DWORD
+    k_4[2].value = 0
+    k_4[2].freeze = false
+    gg.setValues(k_4)
+
+    -- 1634296844 7169380 13407 0 valor 500 diadema
+
+    local e_1 = {}
+    e_1[2] = {}
+    e_1[2].address = r[2].address - 0x274
+    e_1[2].flags = gg.TYPE_DWORD
+    e_1[2].value = 1
+    e_1[2].freeze = false
+    gg.setValues(e_1)
+
+    local x_1 = {}
+    x_1[2] = {}
+    x_1[2].address = r[2].address - 0x270
+    x_1[2].flags = gg.TYPE_DWORD
+    x_1[2].value = 1754453241
+    x_1[2].freeze = false
+    gg.setValues(x_1)
+
+    local v_1 = {}
+    v_1[2] = {}
+    v_1[2].address = r[2].address - 0x2A4
+    v_1[2].flags = gg.TYPE_DWORD
+    v_1[2].value = 0
+    v_1[2].freeze = false
+    gg.setValues(v_1)
+
+    local w_1 = {}
+    w_1[2] = {}
+    w_1[2].address = r[2].address - 0x2A0
+    w_1[2].flags = gg.TYPE_DWORD
+    w_1[2].value = 500
+    w_1[2].freeze = false
+    gg.setValues(w_1)
+
+    ----1634296844 7169380 13407
+    local R_1 = {}
+    R_1[2] = {}
+    R_1[2].address = r[2].address - 0x2BC
+    R_1[2].flags = gg.TYPE_DWORD
+    R_1[2].value = 1634296844
+    R_1[2].freeze = false
+    gg.setValues(R_1)
+
+    local R_2 = {}
+    R_2[2] = {}
+    R_2[2].address = r[2].address - 0x2B8
+    R_2[2].flags = gg.TYPE_DWORD
+    R_2[2].value = 7169380
+    R_2[2].freeze = false
+    gg.setValues(R_2)
+
+    local R_3 = {}
+    R_3[2] = {}
+    R_3[2].address = r[2].address - 0x2B4
+    R_3[2].flags = gg.TYPE_DWORD
+    R_3[2].value = 13407
+    R_3[2].freeze = false
+    gg.setValues(R_3)
+
+    local R_4 = {}
+    R_4[2] = {}
+    R_4[2].address = r[2].address - 0x2B0
+    R_4[2].flags = gg.TYPE_DWORD
+    R_4[2].value = 0
+    R_4[2].freeze = false
+    gg.setValues(R_4)
+
+    --  
+
+    local e_2 = {}
+    e_2[2] = {}
+    e_2[2].address = r[2].address - 0x39C
+    e_2[2].flags = gg.TYPE_DWORD
+    e_2[2].value = 1
+    e_2[2].freeze = false
+    gg.setValues(e_2)
+
+    local x_2 = {}
+    x_2[2] = {}
+    x_2[2].address = r[2].address - 0x398
+    x_2[2].flags = gg.TYPE_DWORD
+    x_2[2].value = 1754453241
+    x_2[2].freeze = false
+    gg.setValues(x_2)
+
+    local v_2 = {}
+    v_2[2] = {}
+    v_2[2].address = r[2].address - 0x3CC
+    v_2[2].flags = gg.TYPE_DWORD
+    v_2[2].value = 0
+    v_2[2].freeze = false
+    gg.setValues(v_2)
+
+    local w_2 = {}
+    w_2[2] = {}
+    w_2[2].address = r[2].address - 0x3C8
+    w_2[2].flags = gg.TYPE_DWORD
+    w_2[2].value = 500
+    w_2[2].freeze = false
+    gg.setValues(w_2)
+    ----1634296844 7169380 13407
+    local H_1 = {}
+    H_1[2] = {}
+    H_1[2].address = r[2].address - 0x3E4
+    H_1[2].flags = gg.TYPE_DWORD
+    H_1[2].value = 1634296844
+    H_1[2].freeze = false
+    gg.setValues(H_1)
+
+    local H_2 = {}
+    H_2[2] = {}
+    H_2[2].address = r[2].address - 0x3E0
+    H_2[2].flags = gg.TYPE_DWORD
+    H_2[2].value = 7169380
+    H_2[2].freeze = false
+    gg.setValues(H_2)
+
+    local H_3 = {}
+    H_3[2] = {}
+    H_3[2].address = r[2].address - 0x3DC
+    H_3[2].flags = gg.TYPE_DWORD
+    H_3[2].value = 13407
+    H_3[2].freeze = false
+    gg.setValues(H_3)
+
+    local H_4 = {}
+    H_4[2] = {}
+    H_4[2].address = r[2].address - 0x3D8
+    H_4[2].flags = gg.TYPE_DWORD
+    H_4[2].value = 0
+    H_4[2].freeze = false
+    gg.setValues(R_4)
+
+    -- 1852404232 1953366119 7037696 1677747456 1694523753 28001 anillo 732 poner 550
+    local e_3 = {}
+    e_3[2] = {}
+    e_3[2].address = r[2].address - 0x4C4
+    e_3[2].flags = gg.TYPE_DWORD
+    e_3[2].value = 1
+    e_3[2].freeze = false
+    gg.setValues(e_3)
+
+    local x_3 = {}
+    x_3[2] = {}
+    x_3[2].address = r[2].address - 0x4C0
+    x_3[2].flags = gg.TYPE_DWORD
+    x_3[2].value = 1754453241
+    x_3[2].freeze = false
+    gg.setValues(x_3)
+
+    local v_3 = {}
+    v_3[2] = {}
+    v_3[2].address = r[2].address - 0x4F4
+    v_3[2].flags = gg.TYPE_DWORD
+    v_3[2].value = 0
+    v_3[2].freeze = false
+    gg.setValues(v_3)
+
+    local w_3 = {}
+    w_3[2] = {}
+    w_3[2].address = r[2].address - 0x4F0
+    w_3[2].flags = gg.TYPE_DWORD
+    w_3[2].value = 500
+    w_3[2].freeze = false
+    gg.setValues(w_3)
+    ------1634296844 7169380 13407
+    local Y_1 = {}
+    Y_1[2] = {}
+    Y_1[2].address = r[2].address - 0x50C
+    Y_1[2].flags = gg.TYPE_DWORD
+    Y_1[2].value = 1634296844
+    Y_1[2].freeze = false
+    gg.setValues(Y_1)
+
+    local Y_2 = {}
+    Y_2[2] = {}
+    Y_2[2].address = r[2].address - 0x508
+    Y_2[2].flags = gg.TYPE_DWORD
+    Y_2[2].value = 7169380
+    Y_2[2].freeze = false
+    gg.setValues(Y_2)
+
+    local Y_3 = {}
+    Y_3[2] = {}
+    Y_3[2].address = r[2].address - 0x504
+    Y_3[2].flags = gg.TYPE_DWORD
+    Y_3[2].value = 13407
+    Y_3[2].freeze = false
+    gg.setValues(Y_3)
+
+    local Y_4 = {}
+    Y_4[2] = {}
+    Y_4[2].address = r[2].address - 0x500
+    Y_4[2].flags = gg.TYPE_DWORD
+    Y_4[2].value = 0
+    Y_4[2].freeze = false
+    gg.setValues(Y_4)
+
+    local Y_5 = {}
+    Y_5[2] = {}
+    Y_5[2].address = r[2].address - 0x4FC
+    Y_5[2].flags = gg.TYPE_DWORD
+    Y_5[2].value = 0
+    Y_5[2].freeze = false
+    gg.setValues(Y_5)
+
+    local Y_6 = {}
+    Y_6[2] = {}
+    Y_6[2].address = r[2].address - 0x4F8
+    Y_6[2].flags = gg.TYPE_DWORD
+    Y_6[2].value = 0
+    Y_6[2].freeze = false
+    gg.setValues(Y_6)
+
+    --
+
+    local e_4 = {}
+    e_4[2] = {}
+    e_4[2].address = r[2].address - 0x5EC
+    e_4[2].flags = gg.TYPE_DWORD
+    e_4[2].value = 1
+    e_4[2].freeze = false
+    gg.setValues(e_4)
+
+    local x_4 = {}
+    x_4[2] = {}
+    x_4[2].address = r[2].address - 0x5E8
+    x_4[2].flags = gg.TYPE_DWORD
+    x_4[2].value = 1754453241
+    x_4[2].freeze = false
+    gg.setValues(x_4)
+
+    local v_4 = {}
+    v_4[2] = {}
+    v_4[2].address = r[2].address - 0x61C
+    v_4[2].flags = gg.TYPE_DWORD
+    v_4[2].value = 0
+    v_4[2].freeze = false
+    gg.setValues(v_4)
+
+    local w_4 = {}
+    w_4[2] = {}
+    w_4[2].address = r[2].address - 0x618
+    w_4[2].flags = gg.TYPE_DWORD
+    w_4[2].value = 500
+    w_4[2].freeze = false
+    gg.setValues(w_4)
+
+    ------1634296844 7169380 13407
+
+    local F_1 = {}
+    F_1[2] = {}
+    F_1[2].address = r[2].address - 0x634
+    F_1[2].flags = gg.TYPE_DWORD
+    F_1[2].value = 1634296844
+    F_1[2].freeze = false
+    gg.setValues(F_1)
+
+    local F_2 = {}
+    F_2[2] = {}
+    F_2[2].address = r[2].address - 0x630
+    F_2[2].flags = gg.TYPE_DWORD
+    F_2[2].value = 7169380
+    F_2[2].freeze = false
+    gg.setValues(F_2)
+
+    local F_3 = {}
+    F_3[2] = {}
+    F_3[2].address = r[2].address - 0x62C
+    F_3[2].flags = gg.TYPE_DWORD
+    F_3[2].value = 13407
+    F_3[2].freeze = false
+    gg.setValues(F_3)
+
+    local F_4 = {}
+    F_4[2] = {}
+    F_4[2].address = r[2].address - 0x628
+    F_4[2].flags = gg.TYPE_DWORD
+    F_4[2].value = 0
+    F_4[2].freeze = false
+    gg.setValues(F_4)
+
+    local F_5 = {}
+    F_5[2] = {}
+    F_5[2].address = r[2].address - 0x624
+    F_5[2].flags = gg.TYPE_DWORD
+    F_5[2].value = 0
+    F_5[2].freeze = false
+    gg.setValues(F_5)
+
+    local F_6 = {}
+    F_6[2] = {}
+    F_6[2].address = r[2].address - 0x620
+    F_6[2].flags = gg.TYPE_DWORD
+    F_6[2].value = 0
+    F_6[2].freeze = false
+    gg.setValues(F_6)
+
+    -- gg.clearResults()
+    hackTrEn_XPES()
+end
+function hackTrEn_XPES()
+
+    -- gg.toast( "Cargando...")
+
+    r = gg.getResults(3)
+    -- do something
+    local t = {}
+    t[3] = {}
+    t[3].address = r[3].address + 0x34 -- 782BF3ADBE80 + es abajo y x4 decimal 
+    t[3].flags = gg.TYPE_FLOAT
+    t[3].value = 3
+    t[3].freeze = false
+    gg.setValues(t)
+    -- 00000001h;6892D4F9h
+    -- 81x4 324 dec a hexa 144 - 4 = 140
+    local e = {}
+    e[3] = {}
+    e[3].address = r[3].address - 0x14C
+    e[3].flags = gg.TYPE_DWORD
+    e[3].value = 1
+    e[3].freeze = false
+    gg.setValues(e)
+
+    local y = {}
+    y[3] = {}
+    y[3].address = r[3].address - 0x148
+    y[3].flags = gg.TYPE_DWORD
+    y[3].value = 1754453241
+    y[3].freeze = false
+    gg.setValues(y)
+
+    local v = {}
+    v[3] = {}
+    v[3].address = r[3].address - 0x17C
+    v[3].flags = gg.TYPE_DWORD
+    v[3].value = 0
+    v[3].freeze = false
+    gg.setValues(v)
+
+    local h = {}
+    h[3] = {}
+    h[3].address = r[3].address - 0x178
+    h[3].flags = gg.TYPE_DWORD
+    h[3].value = 500
+    h[3].freeze = false
+    gg.setValues(h)
+    -- 1634296844 7169380 13407
+
+    local k_1 = {}
+    k_1[3] = {}
+    k_1[3].address = r[3].address - 0x194
+    k_1[3].flags = gg.TYPE_DWORD
+    k_1[3].value = 1634296844
+    k_1[3].freeze = false
+    gg.setValues(k_1)
+
+    local k_2 = {}
+    k_2[3] = {}
+    k_2[3].address = r[3].address - 0x190
+    k_2[3].flags = gg.TYPE_DWORD
+    k_2[3].value = 7169380
+    k_2[3].freeze = false
+    gg.setValues(k_2)
+
+    local k_3 = {}
+    k_3[3] = {}
+    k_3[3].address = r[3].address - 0x18C
+    k_3[3].flags = gg.TYPE_DWORD
+    k_3[3].value = 13407
+    k_3[3].freeze = false
+    gg.setValues(k_3)
+    local k_4 = {}
+    k_4[3] = {}
+    k_4[3].address = r[3].address - 0x188
+    k_4[3].flags = gg.TYPE_DWORD
+    k_4[3].value = 0
+    k_4[3].freeze = false
+    gg.setValues(k_4)
+
+    -- 1634296844 7169380 13407 0 valor 500 diadema
+
+    local e_1 = {}
+    e_1[3] = {}
+    e_1[3].address = r[3].address - 0x274
+    e_1[3].flags = gg.TYPE_DWORD
+    e_1[3].value = 1
+    e_1[3].freeze = false
+    gg.setValues(e_1)
+
+    local x_1 = {}
+    x_1[3] = {}
+    x_1[3].address = r[3].address - 0x270
+    x_1[3].flags = gg.TYPE_DWORD
+    x_1[3].value = 1754453241
+    x_1[3].freeze = false
+    gg.setValues(x_1)
+
+    local v_1 = {}
+    v_1[3] = {}
+    v_1[3].address = r[3].address - 0x2A4
+    v_1[3].flags = gg.TYPE_DWORD
+    v_1[3].value = 0
+    v_1[3].freeze = false
+    gg.setValues(v_1)
+
+    local w_1 = {}
+    w_1[3] = {}
+    w_1[3].address = r[3].address - 0x2A0
+    w_1[3].flags = gg.TYPE_DWORD
+    w_1[3].value = 500
+    w_1[3].freeze = false
+    gg.setValues(w_1)
+
+    ----1634296844 7169380 13407
+    local R_1 = {}
+    R_1[3] = {}
+    R_1[3].address = r[3].address - 0x2BC
+    R_1[3].flags = gg.TYPE_DWORD
+    R_1[3].value = 1634296844
+    R_1[3].freeze = false
+    gg.setValues(R_1)
+
+    local R_2 = {}
+    R_2[3] = {}
+    R_2[3].address = r[3].address - 0x2B8
+    R_2[3].flags = gg.TYPE_DWORD
+    R_2[3].value = 7169380
+    R_2[3].freeze = false
+    gg.setValues(R_2)
+
+    local R_3 = {}
+    R_3[3] = {}
+    R_3[3].address = r[3].address - 0x2B4
+    R_3[3].flags = gg.TYPE_DWORD
+    R_3[3].value = 13407
+    R_3[3].freeze = false
+    gg.setValues(R_3)
+
+    local R_4 = {}
+    R_4[3] = {}
+    R_4[3].address = r[3].address - 0x2B0
+    R_4[3].flags = gg.TYPE_DWORD
+    R_4[3].value = 0
+    R_4[3].freeze = false
+    gg.setValues(R_4)
+
+    --  
+
+    local e_2 = {}
+    e_2[3] = {}
+    e_2[3].address = r[3].address - 0x39C
+    e_2[3].flags = gg.TYPE_DWORD
+    e_2[3].value = 1
+    e_2[3].freeze = false
+    gg.setValues(e_2)
+
+    local x_2 = {}
+    x_2[3] = {}
+    x_2[3].address = r[3].address - 0x398
+    x_2[3].flags = gg.TYPE_DWORD
+    x_2[3].value = 1754453241
+    x_2[3].freeze = false
+    gg.setValues(x_2)
+
+    local v_2 = {}
+    v_2[3] = {}
+    v_2[3].address = r[3].address - 0x3CC
+    v_2[3].flags = gg.TYPE_DWORD
+    v_2[3].value = 0
+    v_2[3].freeze = false
+    gg.setValues(v_2)
+
+    local w_2 = {}
+    w_2[3] = {}
+    w_2[3].address = r[3].address - 0x3C8
+    w_2[3].flags = gg.TYPE_DWORD
+    w_2[3].value = 500
+    w_2[3].freeze = false
+    gg.setValues(w_2)
+    ----1634296844 7169380 13407
+    local H_1 = {}
+    H_1[3] = {}
+    H_1[3].address = r[3].address - 0x3E4
+    H_1[3].flags = gg.TYPE_DWORD
+    H_1[3].value = 1634296844
+    H_1[3].freeze = false
+    gg.setValues(H_1)
+
+    local H_2 = {}
+    H_2[3] = {}
+    H_2[3].address = r[3].address - 0x3E0
+    H_2[3].flags = gg.TYPE_DWORD
+    H_2[3].value = 7169380
+    H_2[3].freeze = false
+    gg.setValues(H_2)
+
+    local H_3 = {}
+    H_3[3] = {}
+    H_3[3].address = r[3].address - 0x3DC
+    H_3[3].flags = gg.TYPE_DWORD
+    H_3[3].value = 13407
+    H_3[3].freeze = false
+    gg.setValues(H_3)
+
+    local H_4 = {}
+    H_4[3] = {}
+    H_4[3].address = r[3].address - 0x3D8
+    H_4[3].flags = gg.TYPE_DWORD
+    H_4[3].value = 0
+    H_4[3].freeze = false
+    gg.setValues(R_4)
+
+    -- 1852404232 1953366119 7037696 1677747456 1694523753 28001 anillo 732 poner 550
+    local e_3 = {}
+    e_3[3] = {}
+    e_3[3].address = r[3].address - 0x4C4
+    e_3[3].flags = gg.TYPE_DWORD
+    e_3[3].value = 1
+    e_3[3].freeze = false
+    gg.setValues(e_3)
+
+    local x_3 = {}
+    x_3[3] = {}
+    x_3[3].address = r[3].address - 0x4C0
+    x_3[3].flags = gg.TYPE_DWORD
+    x_3[3].value = 1754453241
+    x_3[3].freeze = false
+    gg.setValues(x_3)
+
+    local v_3 = {}
+    v_3[3] = {}
+    v_3[3].address = r[3].address - 0x4F4
+    v_3[3].flags = gg.TYPE_DWORD
+    v_3[3].value = 0
+    v_3[3].freeze = false
+    gg.setValues(v_3)
+
+    local w_3 = {}
+    w_3[3] = {}
+    w_3[3].address = r[3].address - 0x4F0
+    w_3[3].flags = gg.TYPE_DWORD
+    w_3[3].value = 500
+    w_3[3].freeze = false
+    gg.setValues(w_3)
+    ------1634296844 7169380 13407
+    local Y_1 = {}
+    Y_1[3] = {}
+    Y_1[3].address = r[3].address - 0x50C
+    Y_1[3].flags = gg.TYPE_DWORD
+    Y_1[3].value = 1634296844
+    Y_1[3].freeze = false
+    gg.setValues(Y_1)
+
+    local Y_2 = {}
+    Y_2[3] = {}
+    Y_2[3].address = r[3].address - 0x508
+    Y_2[3].flags = gg.TYPE_DWORD
+    Y_2[3].value = 7169380
+    Y_2[3].freeze = false
+    gg.setValues(Y_2)
+
+    local Y_3 = {}
+    Y_3[3] = {}
+    Y_3[3].address = r[3].address - 0x504
+    Y_3[3].flags = gg.TYPE_DWORD
+    Y_3[3].value = 13407
+    Y_3[3].freeze = false
+    gg.setValues(Y_3)
+
+    local Y_4 = {}
+    Y_4[3] = {}
+    Y_4[3].address = r[3].address - 0x500
+    Y_4[3].flags = gg.TYPE_DWORD
+    Y_4[3].value = 0
+    Y_4[3].freeze = false
+    gg.setValues(Y_4)
+
+    local Y_5 = {}
+    Y_5[3] = {}
+    Y_5[3].address = r[3].address - 0x4FC
+    Y_5[3].flags = gg.TYPE_DWORD
+    Y_5[3].value = 0
+    Y_5[3].freeze = false
+    gg.setValues(Y_5)
+
+    local Y_6 = {}
+    Y_6[3] = {}
+    Y_6[3].address = r[3].address - 0x4F8
+    Y_6[3].flags = gg.TYPE_DWORD
+    Y_6[3].value = 0
+    Y_6[3].freeze = false
+    gg.setValues(Y_6)
+
+    --
+
+    local e_4 = {}
+    e_4[3] = {}
+    e_4[3].address = r[3].address - 0x5EC
+    e_4[3].flags = gg.TYPE_DWORD
+    e_4[3].value = 1
+    e_4[3].freeze = false
+    gg.setValues(e_4)
+
+    local x_4 = {}
+    x_4[3] = {}
+    x_4[3].address = r[3].address - 0x5E8
+    x_4[3].flags = gg.TYPE_DWORD
+    x_4[3].value = 1754453241
+    x_4[3].freeze = false
+    gg.setValues(x_4)
+
+    local v_4 = {}
+    v_4[3] = {}
+    v_4[3].address = r[3].address - 0x61C
+    v_4[3].flags = gg.TYPE_DWORD
+    v_4[3].value = 0
+    v_4[3].freeze = false
+    gg.setValues(v_4)
+
+    local w_4 = {}
+    w_4[3] = {}
+    w_4[3].address = r[3].address - 0x618
+    w_4[3].flags = gg.TYPE_DWORD
+    w_4[3].value = 500
+    w_4[3].freeze = false
+    gg.setValues(w_4)
+
+    ------1634296844 7169380 13407
+
+    local F_1 = {}
+    F_1[3] = {}
+    F_1[3].address = r[3].address - 0x634
+    F_1[3].flags = gg.TYPE_DWORD
+    F_1[3].value = 1634296844
+    F_1[3].freeze = false
+    gg.setValues(F_1)
+
+    local F_2 = {}
+    F_2[3] = {}
+    F_2[3].address = r[3].address - 0x630
+    F_2[3].flags = gg.TYPE_DWORD
+    F_2[3].value = 7169380
+    F_2[3].freeze = false
+    gg.setValues(F_2)
+
+    local F_3 = {}
+    F_3[3] = {}
+    F_3[3].address = r[3].address - 0x62C
+    F_3[3].flags = gg.TYPE_DWORD
+    F_3[3].value = 13407
+    F_3[3].freeze = false
+    gg.setValues(F_3)
+
+    local F_4 = {}
+    F_4[3] = {}
+    F_4[3].address = r[3].address - 0x628
+    F_4[3].flags = gg.TYPE_DWORD
+    F_4[3].value = 0
+    F_4[3].freeze = false
+    gg.setValues(F_4)
+
+    local F_5 = {}
+    F_5[3] = {}
+    F_5[3].address = r[3].address - 0x624
+    F_5[3].flags = gg.TYPE_DWORD
+    F_5[3].value = 0
+    F_5[3].freeze = false
+    gg.setValues(F_5)
+
+    local F_6 = {}
+    F_6[3] = {}
+    F_6[3].address = r[3].address - 0x620
+    F_6[3].flags = gg.TYPE_DWORD
+    F_6[3].value = 0
+    F_6[3].freeze = false
+    gg.setValues(F_6)
+
+    -- gg.clearResults()
+
+end
+
+function hackTrEnNOOOOOO()
+    gg.alert("Make it more Start the game or restart the game...")
+    gg.toast("Make it more Start the game or restart the game...")
+    gg.toast("Loading...")
+    gg.processResume()
+    gg.clearResults()
+    gg.searchNumber("1600407924;51", gg.TYPE_DWORD)
+    gg.refineNumber("51", gg.TYPE_DWORD)
+    r = gg.getResults(1)
+    -- do something
+    local t = {}
+    t[1] = {}
+    t[1].address = r[1].address + 0x34 -- 782BF3ADBE80 + es abajo y x4 decimal 
+    t[1].flags = gg.TYPE_FLOAT
+    t[1].value = 3
+    t[1].freeze = false
+    gg.setValues(t)
+    -- 00000001h;6892D4F9h
+    -- 81x4 324 dec a hexa 144 - 4 = 140
+    local e = {}
+    e[1] = {}
+    e[1].address = r[1].address - 0x144
+    e[1].flags = gg.TYPE_DWORD
+    e[1].value = 1
+    e[1].freeze = false
+    gg.setValues(e)
+
+    local y = {}
+    y[1] = {}
+    y[1].address = r[1].address - 0x140
+    y[1].flags = gg.TYPE_DWORD
+    y[1].value = 1754453241
+    y[1].freeze = false
+    gg.setValues(y)
+
+    local v = {}
+    v[1] = {}
+    v[1].address = r[1].address - 0x174
+    v[1].flags = gg.TYPE_DWORD
+    v[1].value = 0
+    v[1].freeze = false
+    gg.setValues(v)
+
+    local h = {}
+    h[1] = {}
+    h[1].address = r[1].address - 0x170
+    h[1].flags = gg.TYPE_DWORD
+    h[1].value = 500
+    h[1].freeze = false
+    gg.setValues(h)
+
+    local k_1 = {}
+    k_1[1] = {}
+    k_1[1].address = r[1].address - 0x18C
+    k_1[1].flags = gg.TYPE_DWORD
+    k_1[1].value = 1918985488
+    k_1[1].freeze = false
+    gg.setValues(k_1)
+
+    local k_2 = {}
+    k_2[1] = {}
+    k_2[1].address = r[1].address - 0x188
+    k_2[1].flags = gg.TYPE_DWORD
+    k_2[1].value = 1735289202
+    k_2[1].freeze = false
+    gg.setValues(k_2)
+
+    local k_3 = {}
+    k_3[1] = {}
+    k_3[1].address = r[1].address - 0x184
+    k_3[1].flags = gg.TYPE_DWORD
+    k_3[1].value = 115
+    k_3[1].freeze = false
+    gg.setValues(k_3)
+    local k_4 = {}
+    k_4[1] = {}
+    k_4[1].address = r[1].address - 0x180
+    k_4[1].flags = gg.TYPE_DWORD
+    k_4[1].value = 0
+    k_4[1].freeze = false
+    gg.setValues(k_4)
+
+    -- 1634296844 7169380 13407 0 valor 500 diadema
+
+    local e_1 = {}
+    e_1[1] = {}
+    e_1[1].address = r[1].address - 0x264
+    e_1[1].flags = gg.TYPE_DWORD
+    e_1[1].value = 1
+    e_1[1].freeze = false
+    gg.setValues(e_1)
+
+    local x_1 = {}
+    x_1[1] = {}
+    x_1[1].address = r[1].address - 0x260
+    x_1[1].flags = gg.TYPE_DWORD
+    x_1[1].value = 1754453241
+    x_1[1].freeze = false
+    gg.setValues(x_1)
+
+    local v_1 = {}
+    v_1[1] = {}
+    v_1[1].address = r[1].address - 0x294
+    v_1[1].flags = gg.TYPE_DWORD
+    v_1[1].value = 0
+    v_1[1].freeze = false
+    gg.setValues(v_1)
+
+    local w_1 = {}
+    w_1[1] = {}
+    w_1[1].address = r[1].address - 0x290
+    w_1[1].flags = gg.TYPE_DWORD
+    w_1[1].value = 500
+    w_1[1].freeze = false
+    gg.setValues(w_1)
+
+    --
+    local R_1 = {}
+    R_1[1] = {}
+    R_1[1].address = r[1].address - 0x2AC
+    R_1[1].flags = gg.TYPE_DWORD
+    R_1[1].value = 1634296844
+    R_1[1].freeze = false
+    gg.setValues(R_1)
+
+    local R_2 = {}
+    R_2[1] = {}
+    R_2[1].address = r[1].address - 0x2A8
+    R_2[1].flags = gg.TYPE_DWORD
+    R_2[1].value = 7169380
+    R_2[1].freeze = false
+    gg.setValues(R_2)
+
+    local R_3 = {}
+    R_3[1] = {}
+    R_3[1].address = r[1].address - 0x2A4
+    R_3[1].flags = gg.TYPE_DWORD
+    R_3[1].value = 13407
+    R_3[1].freeze = false
+    gg.setValues(R_3)
+
+    local R_4 = {}
+    R_4[1] = {}
+    R_4[1].address = r[1].address - 0x2A0
+    R_4[1].flags = gg.TYPE_DWORD
+    R_4[1].value = 0
+    R_4[1].freeze = false
+    gg.setValues(R_4)
+
+    -- collar de perlas 800 = 1634037778 1701735538 27491 0
+
+    local e_2 = {}
+    e_2[1] = {}
+    e_2[1].address = r[1].address - 0x384
+    e_2[1].flags = gg.TYPE_DWORD
+    e_2[1].value = 1
+    e_2[1].freeze = false
+    gg.setValues(e_2)
+
+    local x_2 = {}
+    x_2[1] = {}
+    x_2[1].address = r[1].address - 0x380
+    x_2[1].flags = gg.TYPE_DWORD
+    x_2[1].value = 1754453241
+    x_2[1].freeze = false
+    gg.setValues(x_2)
+
+    local v_2 = {}
+    v_2[1] = {}
+    v_2[1].address = r[1].address - 0x3B4
+    v_2[1].flags = gg.TYPE_DWORD
+    v_2[1].value = 0
+    v_2[1].freeze = false
+    gg.setValues(v_2)
+
+    local w_2 = {}
+    w_2[1] = {}
+    w_2[1].address = r[1].address - 0x3B0
+    w_2[1].flags = gg.TYPE_DWORD
+    w_2[1].value = 800
+    w_2[1].freeze = false
+    gg.setValues(w_2)
+    --
+    local H_1 = {}
+    H_1[1] = {}
+    H_1[1].address = r[1].address - 0x3CC
+    H_1[1].flags = gg.TYPE_DWORD
+    H_1[1].value = 1634037778
+    H_1[1].freeze = false
+    gg.setValues(H_1)
+
+    local H_2 = {}
+    H_2[1] = {}
+    H_2[1].address = r[1].address - 0x3C8
+    H_2[1].flags = gg.TYPE_DWORD
+    H_2[1].value = 1701735538
+    H_2[1].freeze = false
+    gg.setValues(H_2)
+
+    local H_3 = {}
+    H_3[1] = {}
+    H_3[1].address = r[1].address - 0x3C4
+    H_3[1].flags = gg.TYPE_DWORD
+    H_3[1].value = 27491
+    H_3[1].freeze = false
+    gg.setValues(H_3)
+
+    local H_4 = {}
+    H_4[1] = {}
+    H_4[1].address = r[1].address - 0x3C0
+    H_4[1].flags = gg.TYPE_DWORD
+    H_4[1].value = 0
+    H_4[1].freeze = false
+    gg.setValues(R_4)
+
+    -- 1852404232 1953366119 7037696 1677747456 1694523753 28001 anillo 732 poner 550
+    local e_3 = {}
+    e_3[1] = {}
+    e_3[1].address = r[1].address - 0x4A4
+    e_3[1].flags = gg.TYPE_DWORD
+    e_3[1].value = 1
+    e_3[1].freeze = false
+    gg.setValues(e_3)
+
+    local x_3 = {}
+    x_3[1] = {}
+    x_3[1].address = r[1].address - 0x4A0
+    x_3[1].flags = gg.TYPE_DWORD
+    x_3[1].value = 1754453241
+    x_3[1].freeze = false
+    gg.setValues(x_3)
+
+    local v_3 = {}
+    v_3[1] = {}
+    v_3[1].address = r[1].address - 0x4D4
+    v_3[1].flags = gg.TYPE_DWORD
+    v_3[1].value = 0
+    v_3[1].freeze = false
+    gg.setValues(v_3)
+
+    local w_3 = {}
+    w_3[1] = {}
+    w_3[1].address = r[1].address - 0x4D0
+    w_3[1].flags = gg.TYPE_DWORD
+    w_3[1].value = 550
+    w_3[1].freeze = false
+    gg.setValues(w_3)
+    -- 1852404232 1953366119 7037696 1677747456 1694523753 28001 anillo 732 poner 550
+    local Y_1 = {}
+    Y_1[1] = {}
+    Y_1[1].address = r[1].address - 0x4EC
+    Y_1[1].flags = gg.TYPE_DWORD
+    Y_1[1].value = 1852404232
+    Y_1[1].freeze = false
+    gg.setValues(Y_1)
+
+    local Y_2 = {}
+    Y_2[1] = {}
+    Y_2[1].address = r[1].address - 0x4E8
+    Y_2[1].flags = gg.TYPE_DWORD
+    Y_2[1].value = 1953366119
+    Y_2[1].freeze = false
+    gg.setValues(Y_2)
+
+    local Y_3 = {}
+    Y_3[1] = {}
+    Y_3[1].address = r[1].address - 0x4E4
+    Y_3[1].flags = gg.TYPE_DWORD
+    Y_3[1].value = 7037696
+    Y_3[1].freeze = false
+    gg.setValues(Y_3)
+
+    local Y_4 = {}
+    Y_4[1] = {}
+    Y_4[1].address = r[1].address - 0x4E0
+    Y_4[1].flags = gg.TYPE_DWORD
+    Y_4[1].value = 1677747456
+    Y_4[1].freeze = false
+    gg.setValues(Y_4)
+
+    local Y_5 = {}
+    Y_5[1] = {}
+    Y_5[1].address = r[1].address - 0x4DC
+    Y_5[1].flags = gg.TYPE_DWORD
+    Y_5[1].value = 1694523753
+    Y_5[1].freeze = false
+    gg.setValues(Y_5)
+
+    local Y_6 = {}
+    Y_6[1] = {}
+    Y_6[1].address = r[1].address - 0x4D8
+    Y_6[1].flags = gg.TYPE_DWORD
+    Y_6[1].value = 28001
+    Y_6[1].freeze = false
+    gg.setValues(Y_6)
+
+    --
+
+    local e_4 = {}
+    e_4[1] = {}
+    e_4[1].address = r[1].address - 0x5C4
+    e_4[1].flags = gg.TYPE_DWORD
+    e_4[1].value = 1
+    e_4[1].freeze = false
+    gg.setValues(e_4)
+
+    local x_4 = {}
+    x_4[1] = {}
+    x_4[1].address = r[1].address - 0x5C0
+    x_4[1].flags = gg.TYPE_DWORD
+    x_4[1].value = 1754453241
+    x_4[1].freeze = false
+    gg.setValues(x_4)
+
+    local v_4 = {}
+    v_4[1] = {}
+    v_4[1].address = r[1].address - 0x5F4
+    v_4[1].flags = gg.TYPE_DWORD
+    v_4[1].value = 0
+    v_4[1].freeze = false
+    gg.setValues(v_4)
+
+    local w_4 = {}
+    w_4[1] = {}
+    w_4[1].address = r[1].address - 0x5F0
+    w_4[1].flags = gg.TYPE_DWORD
+    w_4[1].value = 800
+    w_4[1].freeze = false
+    gg.setValues(w_4)
+
+    -- pendiente de plata  800 = 1852141582 1953390948 12800 0
+
+    local F_1 = {}
+    F_1[1] = {}
+    F_1[1].address = r[1].address - 0x60C
+    F_1[1].flags = gg.TYPE_DWORD
+    F_1[1].value = 1852141582
+    F_1[1].freeze = false
+    gg.setValues(F_1)
+
+    local F_2 = {}
+    F_2[1] = {}
+    F_2[1].address = r[1].address - 0x608
+    F_2[1].flags = gg.TYPE_DWORD
+    F_2[1].value = 1953390948
+    F_2[1].freeze = false
+    gg.setValues(F_2)
+
+    local F_3 = {}
+    F_3[1] = {}
+    F_3[1].address = r[1].address - 0x604
+    F_3[1].flags = gg.TYPE_DWORD
+    F_3[1].value = 12800
+    F_3[1].freeze = false
+    gg.setValues(F_3)
+
+    local F_4 = {}
+    F_4[1] = {}
+    F_4[1].address = r[1].address - 0x600
+    F_4[1].flags = gg.TYPE_DWORD
+    F_4[1].value = 0
+    F_4[1].freeze = false
+    gg.setValues(F_4)
+
+    local F_5 = {}
+    F_5[1] = {}
+    F_5[1].address = r[1].address - 0x5FC
+    F_5[1].flags = gg.TYPE_DWORD
+    F_5[1].value = 0
+    F_5[1].freeze = false
+    gg.setValues(F_5)
+
+    local F_6 = {}
+    F_6[1] = {}
+    F_6[1].address = r[1].address - 0x5F8
+    F_6[1].flags = gg.TYPE_DWORD
+    F_6[1].value = 0
+    F_6[1].freeze = false
+    gg.setValues(F_6)
+
+    hackTrEn_XP_2()
+end
+
+function hackTrEn_XP_2()
+    gg.alert("Hacerlo mas Iniciar el juego o reiniciar el juego...")
+    gg.toast("Hacerlo mas Iniciar el juego o reiniciar el juego...")
+    gg.toast("Cargando...")
+
+    r = gg.getResults(2)
+    -- do something
+    local t = {}
+    t[2] = {}
+    t[2].address = r[2].address + 0x34 -- 782BF3ADBE80 + es abajo y x4 decimal 
+    t[2].flags = gg.TYPE_FLOAT
+    t[2].value = 3
+    t[2].freeze = false
+    gg.setValues(t)
+    -- 00000001h;6892D4F9h
+    -- 81x4 324 dec a hexa 144 - 4 = 140
+    local e = {}
+    e[2] = {}
+    e[2].address = r[2].address - 0x144
+    e[2].flags = gg.TYPE_DWORD
+    e[2].value = 1
+    e[2].freeze = false
+    gg.setValues(e)
+
+    local y = {}
+    y[2] = {}
+    y[2].address = r[2].address - 0x140
+    y[2].flags = gg.TYPE_DWORD
+    y[2].value = 1754453241
+    y[2].freeze = false
+    gg.setValues(y)
+
+    local v = {}
+    v[2] = {}
+    v[2].address = r[2].address - 0x174
+    v[2].flags = gg.TYPE_DWORD
+    v[2].value = 0
+    v[2].freeze = false
+    gg.setValues(v)
+
+    local h = {}
+    h[2] = {}
+    h[2].address = r[2].address - 0x170
+    h[2].flags = gg.TYPE_DWORD
+    h[2].value = 500
+    h[2].freeze = false
+    gg.setValues(h)
+    -- 1634296844 7169380 13407
+
+    local k_1 = {}
+    k_1[2] = {}
+    k_1[2].address = r[2].address - 0x18C
+    k_1[2].flags = gg.TYPE_DWORD
+    k_1[2].value = 1634296844
+    k_1[2].freeze = false
+    gg.setValues(k_1)
+
+    local k_2 = {}
+    k_2[2] = {}
+    k_2[2].address = r[2].address - 0x188
+    k_2[2].flags = gg.TYPE_DWORD
+    k_2[2].value = 7169380
+    k_2[2].freeze = false
+    gg.setValues(k_2)
+
+    local k_3 = {}
+    k_3[2] = {}
+    k_3[2].address = r[2].address - 0x184
+    k_3[2].flags = gg.TYPE_DWORD
+    k_3[2].value = 13407
+    k_3[2].freeze = false
+    gg.setValues(k_3)
+    local k_4 = {}
+    k_4[2] = {}
+    k_4[2].address = r[2].address - 0x180
+    k_4[2].flags = gg.TYPE_DWORD
+    k_4[2].value = 0
+    k_4[2].freeze = false
+    gg.setValues(k_4)
+
+    -- 1634296844 7169380 13407 0 valor 500 diadema
+
+    local e_1 = {}
+    e_1[2] = {}
+    e_1[2].address = r[2].address - 0x264
+    e_1[2].flags = gg.TYPE_DWORD
+    e_1[2].value = 1
+    e_1[2].freeze = false
+    gg.setValues(e_1)
+
+    local x_1 = {}
+    x_1[2] = {}
+    x_1[2].address = r[2].address - 0x260
+    x_1[2].flags = gg.TYPE_DWORD
+    x_1[2].value = 1754453241
+    x_1[2].freeze = false
+    gg.setValues(x_1)
+
+    local v_1 = {}
+    v_1[2] = {}
+    v_1[2].address = r[2].address - 0x294
+    v_1[2].flags = gg.TYPE_DWORD
+    v_1[2].value = 0
+    v_1[2].freeze = false
+    gg.setValues(v_1)
+
+    local w_1 = {}
+    w_1[2] = {}
+    w_1[2].address = r[2].address - 0x290
+    w_1[2].flags = gg.TYPE_DWORD
+    w_1[2].value = 500
+    w_1[2].freeze = false
+    gg.setValues(w_1)
+
+    ----1634296844 7169380 13407
+    local R_1 = {}
+    R_1[2] = {}
+    R_1[2].address = r[2].address - 0x2AC
+    R_1[2].flags = gg.TYPE_DWORD
+    R_1[2].value = 1634296844
+    R_1[2].freeze = false
+    gg.setValues(R_1)
+
+    local R_2 = {}
+    R_2[2] = {}
+    R_2[2].address = r[2].address - 0x2A8
+    R_2[2].flags = gg.TYPE_DWORD
+    R_2[2].value = 7169380
+    R_2[2].freeze = false
+    gg.setValues(R_2)
+
+    local R_3 = {}
+    R_3[2] = {}
+    R_3[2].address = r[2].address - 0x2A4
+    R_3[2].flags = gg.TYPE_DWORD
+    R_3[2].value = 13407
+    R_3[2].freeze = false
+    gg.setValues(R_3)
+
+    local R_4 = {}
+    R_4[2] = {}
+    R_4[2].address = r[2].address - 0x2A0
+    R_4[2].flags = gg.TYPE_DWORD
+    R_4[2].value = 0
+    R_4[2].freeze = false
+    gg.setValues(R_4)
+
+    --  
+
+    local e_2 = {}
+    e_2[2] = {}
+    e_2[2].address = r[2].address - 0x384
+    e_2[2].flags = gg.TYPE_DWORD
+    e_2[2].value = 1
+    e_2[2].freeze = false
+    gg.setValues(e_2)
+
+    local x_2 = {}
+    x_2[2] = {}
+    x_2[2].address = r[2].address - 0x380
+    x_2[2].flags = gg.TYPE_DWORD
+    x_2[2].value = 1754453241
+    x_2[2].freeze = false
+    gg.setValues(x_2)
+
+    local v_2 = {}
+    v_2[2] = {}
+    v_2[2].address = r[2].address - 0x3B4
+    v_2[2].flags = gg.TYPE_DWORD
+    v_2[2].value = 0
+    v_2[2].freeze = false
+    gg.setValues(v_2)
+
+    local w_2 = {}
+    w_2[2] = {}
+    w_2[2].address = r[2].address - 0x3B0
+    w_2[2].flags = gg.TYPE_DWORD
+    w_2[2].value = 500
+    w_2[2].freeze = false
+    gg.setValues(w_2)
+    ----1634296844 7169380 13407
+    local H_1 = {}
+    H_1[2] = {}
+    H_1[2].address = r[2].address - 0x3CC
+    H_1[2].flags = gg.TYPE_DWORD
+    H_1[2].value = 1634296844
+    H_1[2].freeze = false
+    gg.setValues(H_1)
+
+    local H_2 = {}
+    H_2[2] = {}
+    H_2[2].address = r[2].address - 0x3C8
+    H_2[2].flags = gg.TYPE_DWORD
+    H_2[2].value = 7169380
+    H_2[2].freeze = false
+    gg.setValues(H_2)
+
+    local H_3 = {}
+    H_3[2] = {}
+    H_3[2].address = r[2].address - 0x3C4
+    H_3[2].flags = gg.TYPE_DWORD
+    H_3[2].value = 13407
+    H_3[2].freeze = false
+    gg.setValues(H_3)
+
+    local H_4 = {}
+    H_4[2] = {}
+    H_4[2].address = r[2].address - 0x3C0
+    H_4[2].flags = gg.TYPE_DWORD
+    H_4[2].value = 0
+    H_4[2].freeze = false
+    gg.setValues(R_4)
+
+    -- 1852404232 1953366119 7037696 1677747456 1694523753 28001 anillo 732 poner 550
+    local e_3 = {}
+    e_3[2] = {}
+    e_3[2].address = r[2].address - 0x4A4
+    e_3[2].flags = gg.TYPE_DWORD
+    e_3[2].value = 1
+    e_3[2].freeze = false
+    gg.setValues(e_3)
+
+    local x_3 = {}
+    x_3[2] = {}
+    x_3[2].address = r[2].address - 0x4A0
+    x_3[2].flags = gg.TYPE_DWORD
+    x_3[2].value = 1754453241
+    x_3[2].freeze = false
+    gg.setValues(x_3)
+
+    local v_3 = {}
+    v_3[2] = {}
+    v_3[2].address = r[2].address - 0x4D4
+    v_3[2].flags = gg.TYPE_DWORD
+    v_3[2].value = 0
+    v_3[2].freeze = false
+    gg.setValues(v_3)
+
+    local w_3 = {}
+    w_3[2] = {}
+    w_3[2].address = r[2].address - 0x4D0
+    w_3[2].flags = gg.TYPE_DWORD
+    w_3[2].value = 500
+    w_3[2].freeze = false
+    gg.setValues(w_3)
+    ------1634296844 7169380 13407
+    local Y_1 = {}
+    Y_1[2] = {}
+    Y_1[2].address = r[2].address - 0x4EC
+    Y_1[2].flags = gg.TYPE_DWORD
+    Y_1[2].value = 1634296844
+    Y_1[2].freeze = false
+    gg.setValues(Y_1)
+
+    local Y_2 = {}
+    Y_2[2] = {}
+    Y_2[2].address = r[2].address - 0x4E8
+    Y_2[2].flags = gg.TYPE_DWORD
+    Y_2[2].value = 7169380
+    Y_2[2].freeze = false
+    gg.setValues(Y_2)
+
+    local Y_3 = {}
+    Y_3[2] = {}
+    Y_3[2].address = r[2].address - 0x4E4
+    Y_3[2].flags = gg.TYPE_DWORD
+    Y_3[2].value = 13407
+    Y_3[2].freeze = false
+    gg.setValues(Y_3)
+
+    local Y_4 = {}
+    Y_4[2] = {}
+    Y_4[2].address = r[2].address - 0x4E0
+    Y_4[2].flags = gg.TYPE_DWORD
+    Y_4[2].value = 0
+    Y_4[2].freeze = false
+    gg.setValues(Y_4)
+
+    local Y_5 = {}
+    Y_5[2] = {}
+    Y_5[2].address = r[2].address - 0x4DC
+    Y_5[2].flags = gg.TYPE_DWORD
+    Y_5[2].value = 0
+    Y_5[2].freeze = false
+    gg.setValues(Y_5)
+
+    local Y_6 = {}
+    Y_6[2] = {}
+    Y_6[2].address = r[2].address - 0x4D8
+    Y_6[2].flags = gg.TYPE_DWORD
+    Y_6[2].value = 0
+    Y_6[2].freeze = false
+    gg.setValues(Y_6)
+
+    --
+
+    local e_4 = {}
+    e_4[2] = {}
+    e_4[2].address = r[2].address - 0x5C4
+    e_4[2].flags = gg.TYPE_DWORD
+    e_4[2].value = 1
+    e_4[2].freeze = false
+    gg.setValues(e_4)
+
+    local x_4 = {}
+    x_4[2] = {}
+    x_4[2].address = r[2].address - 0x5C0
+    x_4[2].flags = gg.TYPE_DWORD
+    x_4[2].value = 1754453241
+    x_4[2].freeze = false
+    gg.setValues(x_4)
+
+    local v_4 = {}
+    v_4[2] = {}
+    v_4[2].address = r[2].address - 0x5F4
+    v_4[2].flags = gg.TYPE_DWORD
+    v_4[2].value = 0
+    v_4[2].freeze = false
+    gg.setValues(v_4)
+
+    local w_4 = {}
+    w_4[2] = {}
+    w_4[2].address = r[2].address - 0x5F0
+    w_4[2].flags = gg.TYPE_DWORD
+    w_4[2].value = 500
+    w_4[2].freeze = false
+    gg.setValues(w_4)
+
+    ------1634296844 7169380 13407
+
+    local F_1 = {}
+    F_1[2] = {}
+    F_1[2].address = r[2].address - 0x60C
+    F_1[2].flags = gg.TYPE_DWORD
+    F_1[2].value = 1634296844
+    F_1[2].freeze = false
+    gg.setValues(F_1)
+
+    local F_2 = {}
+    F_2[2] = {}
+    F_2[2].address = r[2].address - 0x608
+    F_2[2].flags = gg.TYPE_DWORD
+    F_2[2].value = 7169380
+    F_2[2].freeze = false
+    gg.setValues(F_2)
+
+    local F_3 = {}
+    F_3[2] = {}
+    F_3[2].address = r[2].address - 0x604
+    F_3[2].flags = gg.TYPE_DWORD
+    F_3[2].value = 13407
+    F_3[2].freeze = false
+    gg.setValues(F_3)
+
+    local F_4 = {}
+    F_4[2] = {}
+    F_4[2].address = r[2].address - 0x600
+    F_4[2].flags = gg.TYPE_DWORD
+    F_4[2].value = 0
+    F_4[2].freeze = false
+    gg.setValues(F_4)
+
+    local F_5 = {}
+    F_5[2] = {}
+    F_5[2].address = r[2].address - 0x5FC
+    F_5[2].flags = gg.TYPE_DWORD
+    F_5[2].value = 0
+    F_5[2].freeze = false
+    gg.setValues(F_5)
+
+    local F_6 = {}
+    F_6[2] = {}
+    F_6[2].address = r[2].address - 0x5F8
+    F_6[2].flags = gg.TYPE_DWORD
+    F_6[2].value = 0
+    F_6[2].freeze = false
+    gg.setValues(F_6)
+
+    -- gg.clearResults()
+    hackTrEn_3()
+end
+
+function hackTrEn_1()
+
+    gg.alert("Make it more Start the game or restart the game...")
+    gg.toast("Make it more Start the game or restart the game...")
+    gg.toast("Loading............ train 1")
+    gg.processResume()
+    gg.clearResults()
+    gg.searchNumber("1600407924;51", gg.TYPE_DWORD)
+    gg.refineNumber("51", gg.TYPE_DWORD)
+
+    r = gg.getResults(1)
+    -- do something
+    local t = {}
+    t[1] = {}
+    t[1].address = r[1].address + 0x34
+    t[1].flags = gg.TYPE_FLOAT
+    t[1].value = 3
+    t[1].freeze = false
+    gg.setValues(t)
+    -- 00000001h;6892D4F9h
+
+    local e = {}
+    e[1] = {}
+    e[1].address = r[1].address - 0x144
+    e[1].flags = gg.TYPE_DWORD
+    e[1].value = 1
+    e[1].freeze = false
+    gg.setValues(e)
+
+    local y = {}
+    y[1] = {}
+    y[1].address = r[1].address - 0x140
+    y[1].flags = gg.TYPE_DWORD
+    y[1].value = 1754453241
+    y[1].freeze = false
+    gg.setValues(y)
+
+    local v = {}
+    v[1] = {}
+    v[1].address = r[1].address - 0x174
+    v[1].flags = gg.TYPE_DWORD
+    v[1].value = 0
+    v[1].freeze = false
+    gg.setValues(v)
+
+    local h = {}
+    h[1] = {}
+    h[1].address = r[1].address - 0x170
+    h[1].flags = gg.TYPE_DWORD
+    h[1].value = 1
+    h[1].freeze = false
+    gg.setValues(h)
+
+    -- tren 1  trigo 1701345034 1677751393 13151
+    local k_1 = {}
+    k_1[1] = {}
+    k_1[1].address = r[1].address - 0x18C
+    k_1[1].flags = gg.TYPE_DWORD
+    k_1[1].value = 1701345034
+    k_1[1].freeze = false
+    gg.setValues(k_1)
+
+    local k_2 = {}
+    k_2[1] = {}
+    k_2[1].address = r[1].address - 0x188
+    k_2[1].flags = gg.TYPE_DWORD
+    k_2[1].value = 1677751393
+    k_2[1].freeze = false
+    gg.setValues(k_2)
+
+    local k_3 = {}
+    k_3[1] = {}
+    k_3[1].address = r[1].address - 0x184
+    k_3[1].flags = gg.TYPE_DWORD
+    k_3[1].value = 13151
+    k_3[1].freeze = false
+    gg.setValues(k_3)
+    local k_4 = {}
+    k_4[1] = {}
+    k_4[1].address = r[1].address - 0x180
+    k_4[1].flags = gg.TYPE_DWORD
+    k_4[1].value = 0
+    k_4[1].freeze = false
+    gg.setValues(k_4)
+
+    -- 1634296844 7169380 13407 0 valor 500 diadema
+
+    local e_1 = {}
+    e_1[1] = {}
+    e_1[1].address = r[1].address - 0x264
+    e_1[1].flags = gg.TYPE_DWORD
+    e_1[1].value = 1
+    e_1[1].freeze = false
+    gg.setValues(e_1)
+
+    local x_1 = {}
+    x_1[1] = {}
+    x_1[1].address = r[1].address - 0x260
+    x_1[1].flags = gg.TYPE_DWORD
+    x_1[1].value = 1754453241
+    x_1[1].freeze = false
+    gg.setValues(x_1)
+
+    local v_1 = {}
+    v_1[1] = {}
+    v_1[1].address = r[1].address - 0x294
+    v_1[1].flags = gg.TYPE_DWORD
+    v_1[1].value = 0
+    v_1[1].freeze = false
+    gg.setValues(v_1)
+
+    local w_1 = {}
+    w_1[1] = {}
+    w_1[1].address = r[1].address - 0x290
+    w_1[1].flags = gg.TYPE_DWORD
+    w_1[1].value = 1
+    w_1[1].freeze = false
+    gg.setValues(w_1)
+
+    -- tren 2  trigo 1701345034 1677751393 13151
+    local R_1 = {}
+    R_1[1] = {}
+    R_1[1].address = r[1].address - 0x2AC
+    R_1[1].flags = gg.TYPE_DWORD
+    R_1[1].value = 1701345034
+    R_1[1].freeze = false
+    gg.setValues(R_1)
+
+    local R_2 = {}
+    R_2[1] = {}
+    R_2[1].address = r[1].address - 0x2A8
+    R_2[1].flags = gg.TYPE_DWORD
+    R_2[1].value = 1677751393
+    R_2[1].freeze = false
+    gg.setValues(R_2)
+
+    local R_3 = {}
+    R_3[1] = {}
+    R_3[1].address = r[1].address - 0x2A4
+    R_3[1].flags = gg.TYPE_DWORD
+    R_3[1].value = 13151
+    R_3[1].freeze = false
+    gg.setValues(R_3)
+
+    local R_4 = {}
+    R_4[1] = {}
+    R_4[1].address = r[1].address - 0x2A0
+    R_4[1].flags = gg.TYPE_DWORD
+    R_4[1].value = 0
+    R_4[1].freeze = false
+    gg.setValues(R_4)
+
+    -- collar de perlas 800 = 1634037778 1701735538 27491 0
+
+    local e_2 = {}
+    e_2[1] = {}
+    e_2[1].address = r[1].address - 0x384
+    e_2[1].flags = gg.TYPE_DWORD
+    e_2[1].value = 1
+    e_2[1].freeze = false
+    gg.setValues(e_2)
+
+    local x_2 = {}
+    x_2[1] = {}
+    x_2[1].address = r[1].address - 0x380
+    x_2[1].flags = gg.TYPE_DWORD
+    x_2[1].value = 1754453241
+    x_2[1].freeze = false
+    gg.setValues(x_2)
+
+    local v_2 = {}
+    v_2[1] = {}
+    v_2[1].address = r[1].address - 0x3B4
+    v_2[1].flags = gg.TYPE_DWORD
+    v_2[1].value = 0
+    v_2[1].freeze = false
+    gg.setValues(v_2)
+
+    local w_2 = {}
+    w_2[1] = {}
+    w_2[1].address = r[1].address - 0x3B0
+    w_2[1].flags = gg.TYPE_DWORD
+    w_2[1].value = 1
+    w_2[1].freeze = false
+    gg.setValues(w_2)
+    -- tren 3  trigo 1701345034 1677751393 13151
+    local H_1 = {}
+    H_1[1] = {}
+    H_1[1].address = r[1].address - 0x3CC
+    H_1[1].flags = gg.TYPE_DWORD
+    H_1[1].value = 1701345034
+    H_1[1].freeze = false
+    gg.setValues(H_1)
+
+    local H_2 = {}
+    H_2[1] = {}
+    H_2[1].address = r[1].address - 0x3C8
+    H_2[1].flags = gg.TYPE_DWORD
+    H_2[1].value = 1677751393
+    H_2[1].freeze = false
+    gg.setValues(H_2)
+
+    local H_3 = {}
+    H_3[1] = {}
+    H_3[1].address = r[1].address - 0x3C4
+    H_3[1].flags = gg.TYPE_DWORD
+    H_3[1].value = 13151
+    H_3[1].freeze = false
+    gg.setValues(H_3)
+
+    local H_4 = {}
+    H_4[1] = {}
+    H_4[1].address = r[1].address - 0x3C0
+    H_4[1].flags = gg.TYPE_DWORD
+    H_4[1].value = 0
+    H_4[1].freeze = false
+    gg.setValues(R_4)
+
+    -- collar de plata  800 = 1852141582 1953390948 12800 0
+
+    local e_3 = {}
+    e_3[1] = {}
+    e_3[1].address = r[1].address - 0x4A4
+    e_3[1].flags = gg.TYPE_DWORD
+    e_3[1].value = 1
+    e_3[1].freeze = false
+    gg.setValues(e_3)
+
+    local x_3 = {}
+    x_3[1] = {}
+    x_3[1].address = r[1].address - 0x4A0
+    x_3[1].flags = gg.TYPE_DWORD
+    x_3[1].value = 1754453241
+    x_3[1].freeze = false
+    gg.setValues(x_3)
+
+    local v_3 = {}
+    v_3[1] = {}
+    v_3[1].address = r[1].address - 0x4D4
+    v_3[1].flags = gg.TYPE_DWORD
+    v_3[1].value = 0
+    v_3[1].freeze = false
+    gg.setValues(v_3)
+
+    local w_3 = {}
+    w_3[1] = {}
+    w_3[1].address = r[1].address - 0x4D0
+    w_3[1].flags = gg.TYPE_DWORD
+    w_3[1].value = 1
+    w_3[1].freeze = false
+    gg.setValues(w_3)
+    -- tren 4  trigo 1701345034 1677751393 13151
+    local Y_1 = {}
+    Y_1[1] = {}
+    Y_1[1].address = r[1].address - 0x4EC
+    Y_1[1].flags = gg.TYPE_DWORD
+    Y_1[1].value = 1701345034
+    Y_1[1].freeze = false
+    gg.setValues(Y_1)
+
+    local Y_2 = {}
+    Y_2[1] = {}
+    Y_2[1].address = r[1].address - 0x4E8
+    Y_2[1].flags = gg.TYPE_DWORD
+    Y_2[1].value = 1677751393
+    Y_2[1].freeze = false
+    gg.setValues(Y_2)
+
+    local Y_3 = {}
+    Y_3[1] = {}
+    Y_3[1].address = r[1].address - 0x4E4
+    Y_3[1].flags = gg.TYPE_DWORD
+    Y_3[1].value = 13151
+    Y_3[1].freeze = false
+    gg.setValues(Y_3)
+
+    local Y_4 = {}
+    Y_4[1] = {}
+    Y_4[1].address = r[1].address - 0x4E0
+    Y_4[1].flags = gg.TYPE_DWORD
+    Y_4[1].value = 0
+    Y_4[1].freeze = false
+    gg.setValues(Y_4)
+
+    -- Perfume          800 = 1919250458 1701672294 1953787714 25964
+
+    local e_4 = {}
+    e_4[1] = {}
+    e_4[1].address = r[1].address - 0x5C4
+    e_4[1].flags = gg.TYPE_DWORD
+    e_4[1].value = 1
+    e_4[1].freeze = false
+    gg.setValues(e_4)
+
+    local x_4 = {}
+    x_4[1] = {}
+    x_4[1].address = r[1].address - 0x5C0
+    x_4[1].flags = gg.TYPE_DWORD
+    x_4[1].value = 1754453241
+    x_4[1].freeze = false
+    gg.setValues(x_4)
+
+    local v_4 = {}
+    v_4[1] = {}
+    v_4[1].address = r[1].address - 0x5F4
+    v_4[1].flags = gg.TYPE_DWORD
+    v_4[1].value = 0
+    v_4[1].freeze = false
+    gg.setValues(v_4)
+
+    local w_4 = {}
+    w_4[1] = {}
+    w_4[1].address = r[1].address - 0x5F0
+    w_4[1].flags = gg.TYPE_DWORD
+    w_4[1].value = 1
+    w_4[1].freeze = false
+    gg.setValues(w_4)
+
+    -- tren 5  trigo 1701345034 1677751393 13151
+    local F_1 = {}
+    F_1[1] = {}
+    F_1[1].address = r[1].address - 0x60C
+    F_1[1].flags = gg.TYPE_DWORD
+    F_1[1].value = 1701345034
+    F_1[1].freeze = false
+    gg.setValues(F_1)
+
+    local F_2 = {}
+    F_2[1] = {}
+    F_2[1].address = r[1].address - 0x608
+    F_2[1].flags = gg.TYPE_DWORD
+    F_2[1].value = 1677751393
+    F_2[1].freeze = false
+    gg.setValues(F_2)
+
+    local F_3 = {}
+    F_3[1] = {}
+    F_3[1].address = r[1].address - 0x604
+    F_3[1].flags = gg.TYPE_DWORD
+    F_3[1].value = 13151
+    F_3[1].freeze = false
+    gg.setValues(F_3)
+
+    local F_4 = {}
+    F_4[1] = {}
+    F_4[1].address = r[1].address - 0x600
+    F_4[1].flags = gg.TYPE_DWORD
+    F_4[1].value = 0
+    F_4[1].freeze = false
+    gg.setValues(F_4)
+
+    hackTrEn_2()
+end
+
+function hackTrEn_2()
+
+    gg.toast("Loading............ train 2")
+    -- gg.processResume()
+    -- gg.clearResults()
+    -- gg.searchNumber("1600407924;51", gg.TYPE_DWORD ) 
+    -- gg.refineNumber("51", gg.TYPE_DWORD )
+
+    r = gg.getResults(2)
+    -- do something
+    local t = {}
+    t[2] = {}
+    t[2].address = r[2].address + 0x34
+    t[2].flags = gg.TYPE_FLOAT
+    t[2].value = 3
+    t[2].freeze = false
+    gg.setValues(t)
+    -- 00000001h;6892D4F9h
+    -- 81x4 324 dec a hexa 144 - 4 = 140
+    local e = {}
+    e[2] = {}
+    e[2].address = r[2].address - 0x144
+    e[2].flags = gg.TYPE_DWORD
+    e[2].value = 1
+    e[2].freeze = false
+    gg.setValues(e)
+
+    local y = {}
+    y[2] = {}
+    y[2].address = r[2].address - 0x140
+    y[2].flags = gg.TYPE_DWORD
+    y[2].value = 1754453241
+    y[2].freeze = false
+    gg.setValues(y)
+
+    local v = {}
+    v[2] = {}
+    v[2].address = r[2].address - 0x174
+    v[2].flags = gg.TYPE_DWORD
+    v[2].value = 0
+    v[2].freeze = false
+    gg.setValues(v)
+
+    local h = {}
+    h[2] = {}
+    h[2].address = r[2].address - 0x170
+    h[2].flags = gg.TYPE_DWORD
+    h[2].value = 1
+    h[2].freeze = false
+    gg.setValues(h)
+
+    -- tren 1  trigo 1701345034 1677751393 13151
+    local k_1 = {}
+    k_1[2] = {}
+    k_1[2].address = r[2].address - 0x18C
+    k_1[2].flags = gg.TYPE_DWORD
+    k_1[2].value = 1701345034
+    k_1[2].freeze = false
+    gg.setValues(k_1)
+
+    local k_2 = {}
+    k_2[2] = {}
+    k_2[2].address = r[2].address - 0x188
+    k_2[2].flags = gg.TYPE_DWORD
+    k_2[2].value = 1677751393
+    k_2[2].freeze = false
+    gg.setValues(k_2)
+
+    local k_3 = {}
+    k_3[2] = {}
+    k_3[2].address = r[2].address - 0x184
+    k_3[2].flags = gg.TYPE_DWORD
+    k_3[2].value = 13151
+    k_3[2].freeze = false
+    gg.setValues(k_3)
+    local k_4 = {}
+    k_4[2] = {}
+    k_4[2].address = r[2].address - 0x180
+    k_4[2].flags = gg.TYPE_DWORD
+    k_4[2].value = 0
+    k_4[2].freeze = false
+    gg.setValues(k_4)
+
+    -- 1634296844 7169380 13407 0 valor 500 diadema
+
+    local e_1 = {}
+    e_1[2] = {}
+    e_1[2].address = r[2].address - 0x264
+    e_1[2].flags = gg.TYPE_DWORD
+    e_1[2].value = 1
+    e_1[2].freeze = false
+    gg.setValues(e_1)
+
+    local x_1 = {}
+    x_1[2] = {}
+    x_1[2].address = r[2].address - 0x260
+    x_1[2].flags = gg.TYPE_DWORD
+    x_1[2].value = 1754453241
+    x_1[2].freeze = false
+    gg.setValues(x_1)
+
+    local v_1 = {}
+    v_1[2] = {}
+    v_1[2].address = r[2].address - 0x294
+    v_1[2].flags = gg.TYPE_DWORD
+    v_1[2].value = 0
+    v_1[2].freeze = false
+    gg.setValues(v_1)
+
+    local w_1 = {}
+    w_1[2] = {}
+    w_1[2].address = r[2].address - 0x290
+    w_1[2].flags = gg.TYPE_DWORD
+    w_1[2].value = 1
+    w_1[2].freeze = false
+    gg.setValues(w_1)
+
+    -- tren 2  tirgo 1701345034 1677751393 13151
+    local R_1 = {}
+    R_1[2] = {}
+    R_1[2].address = r[2].address - 0x2AC
+    R_1[2].flags = gg.TYPE_DWORD
+    R_1[2].value = 1701345034
+    R_1[2].freeze = false
+    gg.setValues(R_1)
+
+    local R_2 = {}
+    R_2[2] = {}
+    R_2[2].address = r[2].address - 0x2A8
+    R_2[2].flags = gg.TYPE_DWORD
+    R_2[2].value = 1677751393
+    R_2[2].freeze = false
+    gg.setValues(R_2)
+
+    local R_3 = {}
+    R_3[2] = {}
+    R_3[2].address = r[2].address - 0x2A4
+    R_3[2].flags = gg.TYPE_DWORD
+    R_3[2].value = 13151
+    R_3[2].freeze = false
+    gg.setValues(R_3)
+
+    local R_4 = {}
+    R_4[2] = {}
+    R_4[2].address = r[2].address - 0x2A0
+    R_4[2].flags = gg.TYPE_DWORD
+    R_4[2].value = 0
+    R_4[2].freeze = false
+    gg.setValues(R_4)
+
+    -- collar de perlas 800 = 1634037778 1701735538 27491 0
+
+    local e_2 = {}
+    e_2[2] = {}
+    e_2[2].address = r[2].address - 0x384
+    e_2[2].flags = gg.TYPE_DWORD
+    e_2[2].value = 1
+    e_2[2].freeze = false
+    gg.setValues(e_2)
+
+    local x_2 = {}
+    x_2[2] = {}
+    x_2[2].address = r[2].address - 0x380
+    x_2[2].flags = gg.TYPE_DWORD
+    x_2[2].value = 1754453241
+    x_2[2].freeze = false
+    gg.setValues(x_2)
+
+    local v_2 = {}
+    v_2[2] = {}
+    v_2[2].address = r[2].address - 0x3B4
+    v_2[2].flags = gg.TYPE_DWORD
+    v_2[2].value = 0
+    v_2[2].freeze = false
+    gg.setValues(v_2)
+
+    local w_2 = {}
+    w_2[2] = {}
+    w_2[2].address = r[2].address - 0x3B0
+    w_2[2].flags = gg.TYPE_DWORD
+    w_2[2].value = 1
+    w_2[2].freeze = false
+    gg.setValues(w_2)
+    -- tren 3  trigo 1701345034 1677751393 13151
+    local H_1 = {}
+    H_1[2] = {}
+    H_1[2].address = r[2].address - 0x3CC
+    H_1[2].flags = gg.TYPE_DWORD
+    H_1[2].value = 1701345034
+    H_1[2].freeze = false
+    gg.setValues(H_1)
+
+    local H_2 = {}
+    H_2[2] = {}
+    H_2[2].address = r[2].address - 0x3C8
+    H_2[2].flags = gg.TYPE_DWORD
+    H_2[2].value = 1677751393
+    H_2[2].freeze = false
+    gg.setValues(H_2)
+
+    local H_3 = {}
+    H_3[2] = {}
+    H_3[2].address = r[2].address - 0x3C4
+    H_3[2].flags = gg.TYPE_DWORD
+    H_3[2].value = 13151
+    H_3[2].freeze = false
+    gg.setValues(H_3)
+
+    local H_4 = {}
+    H_4[2] = {}
+    H_4[2].address = r[2].address - 0x3C0
+    H_4[2].flags = gg.TYPE_DWORD
+    H_4[2].value = 0
+    H_4[2].freeze = false
+    gg.setValues(R_4)
+
+    -- collar de plata  800 = 1852141582 1953390948 12800 0
+
+    local e_3 = {}
+    e_3[2] = {}
+    e_3[2].address = r[2].address - 0x4A4
+    e_3[2].flags = gg.TYPE_DWORD
+    e_3[2].value = 1
+    e_3[2].freeze = false
+    gg.setValues(e_3)
+
+    local x_3 = {}
+    x_3[2] = {}
+    x_3[2].address = r[2].address - 0x4A0
+    x_3[2].flags = gg.TYPE_DWORD
+    x_3[2].value = 1754453241
+    x_3[2].freeze = false
+    gg.setValues(x_3)
+
+    local v_3 = {}
+    v_3[2] = {}
+    v_3[2].address = r[2].address - 0x4D4
+    v_3[2].flags = gg.TYPE_DWORD
+    v_3[2].value = 0
+    v_3[2].freeze = false
+    gg.setValues(v_3)
+
+    local w_3 = {}
+    w_3[2] = {}
+    w_3[2].address = r[2].address - 0x4D0
+    w_3[2].flags = gg.TYPE_DWORD
+    w_3[2].value = 1
+    w_3[2].freeze = false
+    gg.setValues(w_3)
+    -- tren 4  trigo 1701345034 1677751393 13151
+    local Y_1 = {}
+    Y_1[2] = {}
+    Y_1[2].address = r[2].address - 0x4EC
+    Y_1[2].flags = gg.TYPE_DWORD
+    Y_1[2].value = 1701345034
+    Y_1[2].freeze = false
+    gg.setValues(Y_1)
+
+    local Y_2 = {}
+    Y_2[2] = {}
+    Y_2[2].address = r[2].address - 0x4E8
+    Y_2[2].flags = gg.TYPE_DWORD
+    Y_2[2].value = 1677751393
+    Y_2[2].freeze = false
+    gg.setValues(Y_2)
+
+    local Y_3 = {}
+    Y_3[2] = {}
+    Y_3[2].address = r[2].address - 0x4E4
+    Y_3[2].flags = gg.TYPE_DWORD
+    Y_3[2].value = 13151
+    Y_3[2].freeze = false
+    gg.setValues(Y_3)
+
+    local Y_4 = {}
+    Y_4[2] = {}
+    Y_4[2].address = r[2].address - 0x4E0
+    Y_4[2].flags = gg.TYPE_DWORD
+    Y_4[2].value = 0
+    Y_4[2].freeze = false
+    gg.setValues(Y_4)
+
+    -- Perfume          800 = 1919250458 1701672294 1953787714 25964
+
+    local e_4 = {}
+    e_4[2] = {}
+    e_4[2].address = r[2].address - 0x5C4
+    e_4[2].flags = gg.TYPE_DWORD
+    e_4[2].value = 1
+    e_4[2].freeze = false
+    gg.setValues(e_4)
+
+    local x_4 = {}
+    x_4[2] = {}
+    x_4[2].address = r[2].address - 0x5C0
+    x_4[2].flags = gg.TYPE_DWORD
+    x_4[2].value = 1754453241
+    x_4[2].freeze = false
+    gg.setValues(x_4)
+
+    local v_4 = {}
+    v_4[2] = {}
+    v_4[2].address = r[2].address - 0x5F4
+    v_4[2].flags = gg.TYPE_DWORD
+    v_4[2].value = 0
+    v_4[2].freeze = false
+    gg.setValues(v_4)
+
+    local w_4 = {}
+    w_4[2] = {}
+    w_4[2].address = r[2].address - 0x5F0
+    w_4[2].flags = gg.TYPE_DWORD
+    w_4[2].value = 1
+    w_4[2].freeze = false
+    gg.setValues(w_4)
+
+    -- tren 5  trigo 1701345034 1677751393 13151
+    local F_1 = {}
+    F_1[2] = {}
+    F_1[2].address = r[2].address - 0x60C
+    F_1[2].flags = gg.TYPE_DWORD
+    F_1[2].value = 1701345034
+    F_1[2].freeze = false
+    gg.setValues(F_1)
+
+    local F_2 = {}
+    F_2[2] = {}
+    F_2[2].address = r[2].address - 0x608
+    F_2[2].flags = gg.TYPE_DWORD
+    F_2[2].value = 1677751393
+    F_2[2].freeze = false
+    gg.setValues(F_2)
+
+    local F_3 = {}
+    F_3[2] = {}
+    F_3[2].address = r[2].address - 0x604
+    F_3[2].flags = gg.TYPE_DWORD
+    F_3[2].value = 13151
+    F_3[2].freeze = false
+    gg.setValues(F_3)
+
+    local F_4 = {}
+    F_4[2] = {}
+    F_4[2].address = r[2].address - 0x600
+    F_4[2].flags = gg.TYPE_DWORD
+    F_4[2].value = 0
+    F_4[2].freeze = false
+    gg.setValues(F_4)
+
+    hackTrEn_3()
+
+end
+
+function hackTrEn_3()
+
+    gg.toast("Loading............ train 3")
+    -- gg.processResume()
+    -- gg.clearResults()
+    -- gg.searchNumber("1600407924;51", gg.TYPE_DWORD ) 
+    -- gg.refineNumber("51", gg.TYPE_DWORD )
+
+    r = gg.getResults(3)
+    -- do something
+    local t = {}
+    t[3] = {}
+    t[3].address = r[3].address + 0x34
+    t[3].flags = gg.TYPE_FLOAT
+    t[3].value = 3
+    t[3].freeze = false
+    gg.setValues(t)
+    -- 00000001h;6892D4F9h
+    -- 81x4 324 dec a hexa 144 - 4 = 140
+    local e = {}
+    e[3] = {}
+    e[3].address = r[3].address - 0x144
+    e[3].flags = gg.TYPE_DWORD
+    e[3].value = 1
+    e[3].freeze = false
+    gg.setValues(e)
+
+    local y = {}
+    y[3] = {}
+    y[3].address = r[3].address - 0x140
+    y[3].flags = gg.TYPE_DWORD
+    y[3].value = 1754453241
+    y[3].freeze = false
+    gg.setValues(y)
+
+    local v = {}
+    v[3] = {}
+    v[3].address = r[3].address - 0x174
+    v[3].flags = gg.TYPE_DWORD
+    v[3].value = 0
+    v[3].freeze = false
+    gg.setValues(v)
+
+    local h = {}
+    h[3] = {}
+    h[3].address = r[3].address - 0x170
+    h[3].flags = gg.TYPE_DWORD
+    h[3].value = 1
+    h[3].freeze = false
+    gg.setValues(h)
+
+    -- tren 1  trigo 1701345034 1677751393 13151
+    local k_1 = {}
+    k_1[3] = {}
+    k_1[3].address = r[3].address - 0x18C
+    k_1[3].flags = gg.TYPE_DWORD
+    k_1[3].value = 1701345034
+    k_1[3].freeze = false
+    gg.setValues(k_1)
+
+    local k_2 = {}
+    k_2[3] = {}
+    k_2[3].address = r[3].address - 0x188
+    k_2[3].flags = gg.TYPE_DWORD
+    k_2[3].value = 1677751393
+    k_2[3].freeze = false
+    gg.setValues(k_2)
+
+    local k_3 = {}
+    k_3[3] = {}
+    k_3[3].address = r[3].address - 0x184
+    k_3[3].flags = gg.TYPE_DWORD
+    k_3[3].value = 13151
+    k_3[3].freeze = false
+    gg.setValues(k_3)
+    local k_4 = {}
+    k_4[3] = {}
+    k_4[3].address = r[3].address - 0x180
+    k_4[3].flags = gg.TYPE_DWORD
+    k_4[3].value = 0
+    k_4[3].freeze = false
+    gg.setValues(k_4)
+
+    -- 1634296844 7169380 13407 0 valor 500 diadema
+
+    local e_1 = {}
+    e_1[3] = {}
+    e_1[3].address = r[3].address - 0x264
+    e_1[3].flags = gg.TYPE_DWORD
+    e_1[3].value = 1
+    e_1[3].freeze = false
+    gg.setValues(e_1)
+
+    local x_1 = {}
+    x_1[3] = {}
+    x_1[3].address = r[3].address - 0x260
+    x_1[3].flags = gg.TYPE_DWORD
+    x_1[3].value = 1754453241
+    x_1[3].freeze = false
+    gg.setValues(x_1)
+
+    local v_1 = {}
+    v_1[3] = {}
+    v_1[3].address = r[3].address - 0x294
+    v_1[3].flags = gg.TYPE_DWORD
+    v_1[3].value = 0
+    v_1[3].freeze = false
+    gg.setValues(v_1)
+
+    local w_1 = {}
+    w_1[3] = {}
+    w_1[3].address = r[3].address - 0x290
+    w_1[3].flags = gg.TYPE_DWORD
+    w_1[3].value = 1
+    w_1[3].freeze = false
+    gg.setValues(w_1)
+
+    -- tren 2  trigo 1701345034 1677751393 13151
+    local R_1 = {}
+    R_1[3] = {}
+    R_1[3].address = r[3].address - 0x2AC
+    R_1[3].flags = gg.TYPE_DWORD
+    R_1[3].value = 1701345034
+    R_1[3].freeze = false
+    gg.setValues(R_1)
+
+    local R_2 = {}
+    R_2[3] = {}
+    R_2[3].address = r[3].address - 0x2A8
+    R_2[3].flags = gg.TYPE_DWORD
+    R_2[3].value = 1677751393
+    R_2[3].freeze = false
+    gg.setValues(R_2)
+
+    local R_3 = {}
+    R_3[3] = {}
+    R_3[3].address = r[3].address - 0x2A4
+    R_3[3].flags = gg.TYPE_DWORD
+    R_3[3].value = 13151
+    R_3[3].freeze = false
+    gg.setValues(R_3)
+
+    local R_4 = {}
+    R_4[3] = {}
+    R_4[3].address = r[3].address - 0x2A0
+    R_4[3].flags = gg.TYPE_DWORD
+    R_4[3].value = 0
+    R_4[3].freeze = false
+    gg.setValues(R_4)
+
+    -- collar de perlas 800 = 1634037778 1701735538 27491 0
+
+    local e_2 = {}
+    e_2[3] = {}
+    e_2[3].address = r[3].address - 0x384
+    e_2[3].flags = gg.TYPE_DWORD
+    e_2[3].value = 1
+    e_2[3].freeze = false
+    gg.setValues(e_2)
+
+    local x_2 = {}
+    x_2[3] = {}
+    x_2[3].address = r[3].address - 0x380
+    x_2[3].flags = gg.TYPE_DWORD
+    x_2[3].value = 1754453241
+    x_2[3].freeze = false
+    gg.setValues(x_2)
+
+    local v_2 = {}
+    v_2[3] = {}
+    v_2[3].address = r[3].address - 0x3B4
+    v_2[3].flags = gg.TYPE_DWORD
+    v_2[3].value = 0
+    v_2[3].freeze = false
+    gg.setValues(v_2)
+
+    local w_2 = {}
+    w_2[3] = {}
+    w_2[3].address = r[3].address - 0x3B0
+    w_2[3].flags = gg.TYPE_DWORD
+    w_2[3].value = 1
+    w_2[3].freeze = false
+    gg.setValues(w_2)
+    -- tren 3  trigo 1701345034 1677751393 13151
+    local H_1 = {}
+    H_1[3] = {}
+    H_1[3].address = r[3].address - 0x3CC
+    H_1[3].flags = gg.TYPE_DWORD
+    H_1[3].value = 1701345034
+    H_1[3].freeze = false
+    gg.setValues(H_1)
+
+    local H_2 = {}
+    H_2[3] = {}
+    H_2[3].address = r[3].address - 0x3C8
+    H_2[3].flags = gg.TYPE_DWORD
+    H_2[3].value = 1677751393
+    H_2[3].freeze = false
+    gg.setValues(H_2)
+
+    local H_3 = {}
+    H_3[3] = {}
+    H_3[3].address = r[3].address - 0x3C4
+    H_3[3].flags = gg.TYPE_DWORD
+    H_3[3].value = 13151
+    H_3[3].freeze = false
+    gg.setValues(H_3)
+
+    local H_4 = {}
+    H_4[3] = {}
+    H_4[3].address = r[3].address - 0x3C0
+    H_4[3].flags = gg.TYPE_DWORD
+    H_4[3].value = 0
+    H_4[3].freeze = false
+    gg.setValues(R_4)
+
+    -- collar de plata  800 = 1852141582 1953390948 12800 0
+
+    local e_3 = {}
+    e_3[3] = {}
+    e_3[3].address = r[3].address - 0x4A4
+    e_3[3].flags = gg.TYPE_DWORD
+    e_3[3].value = 1
+    e_3[3].freeze = false
+    gg.setValues(e_3)
+
+    local x_3 = {}
+    x_3[3] = {}
+    x_3[3].address = r[3].address - 0x4A0
+    x_3[3].flags = gg.TYPE_DWORD
+    x_3[3].value = 1754453241
+    x_3[3].freeze = false
+    gg.setValues(x_3)
+
+    local v_3 = {}
+    v_3[3] = {}
+    v_3[3].address = r[3].address - 0x4D4
+    v_3[3].flags = gg.TYPE_DWORD
+    v_3[3].value = 0
+    v_3[3].freeze = false
+    gg.setValues(v_3)
+
+    local w_3 = {}
+    w_3[3] = {}
+    w_3[3].address = r[3].address - 0x4D0
+    w_3[3].flags = gg.TYPE_DWORD
+    w_3[3].value = 1
+    w_3[3].freeze = false
+    gg.setValues(w_3)
+    -- tren 4  trigo 1701345034 1677751393 13151
+    local Y_1 = {}
+    Y_1[3] = {}
+    Y_1[3].address = r[3].address - 0x4EC
+    Y_1[3].flags = gg.TYPE_DWORD
+    Y_1[3].value = 1701345034
+    Y_1[3].freeze = false
+    gg.setValues(Y_1)
+
+    local Y_2 = {}
+    Y_2[3] = {}
+    Y_2[3].address = r[3].address - 0x4E8
+    Y_2[3].flags = gg.TYPE_DWORD
+    Y_2[3].value = 1677751393
+    Y_2[3].freeze = false
+    gg.setValues(Y_2)
+
+    local Y_3 = {}
+    Y_3[3] = {}
+    Y_3[3].address = r[3].address - 0x4E4
+    Y_3[3].flags = gg.TYPE_DWORD
+    Y_3[3].value = 13151
+    Y_3[3].freeze = false
+    gg.setValues(Y_3)
+
+    local Y_4 = {}
+    Y_4[3] = {}
+    Y_4[3].address = r[3].address - 0x4E0
+    Y_4[3].flags = gg.TYPE_DWORD
+    Y_4[3].value = 0
+    Y_4[3].freeze = false
+    gg.setValues(Y_4)
+
+    -- Perfume          800 = 1919250458 1701672294 1953787714 25964
+
+    local e_4 = {}
+    e_4[3] = {}
+    e_4[3].address = r[3].address - 0x5C4
+    e_4[3].flags = gg.TYPE_DWORD
+    e_4[3].value = 1
+    e_4[3].freeze = false
+    gg.setValues(e_4)
+
+    local x_4 = {}
+    x_4[3] = {}
+    x_4[3].address = r[3].address - 0x5C0
+    x_4[3].flags = gg.TYPE_DWORD
+    x_4[3].value = 1754453241
+    x_4[3].freeze = false
+    gg.setValues(x_4)
+
+    local v_4 = {}
+    v_4[3] = {}
+    v_4[3].address = r[3].address - 0x5F4
+    v_4[3].flags = gg.TYPE_DWORD
+    v_4[3].value = 0
+    v_4[3].freeze = false
+    gg.setValues(v_4)
+
+    local w_4 = {}
+    w_4[3] = {}
+    w_4[3].address = r[3].address - 0x5F0
+    w_4[3].flags = gg.TYPE_DWORD
+    w_4[3].value = 1
+    w_4[3].freeze = false
+    gg.setValues(w_4)
+
+    -- tren 5  trigo 1701345034 1677751393 13151
+    local F_1 = {}
+    F_1[3] = {}
+    F_1[3].address = r[3].address - 0x60C
+    F_1[3].flags = gg.TYPE_DWORD
+    F_1[3].value = 1701345034
+    F_1[3].freeze = false
+    gg.setValues(F_1)
+
+    local F_2 = {}
+    F_2[3] = {}
+    F_2[3].address = r[3].address - 0x608
+    F_2[3].flags = gg.TYPE_DWORD
+    F_2[3].value = 1677751393
+    F_2[3].freeze = false
+    gg.setValues(F_2)
+
+    local F_3 = {}
+    F_3[3] = {}
+    F_3[3].address = r[3].address - 0x604
+    F_3[3].flags = gg.TYPE_DWORD
+    F_3[3].value = 13151
+    F_3[3].freeze = false
+    gg.setValues(F_3)
+
+    local F_4 = {}
+    F_4[3] = {}
+    F_4[3].address = r[3].address - 0x600
+    F_4[3].flags = gg.TYPE_DWORD
+    F_4[3].value = 0
+    F_4[3].freeze = false
+    gg.setValues(F_4)
+
+    gg.clearResults()
+end
+
+function hackTrEnTrebol_1()
+
+    --  gg.alert("Hacerlo mas Iniciar el juego o reiniciar el juego...") 
+    --  gg.toast( "Hacerlo mas Iniciar el juego o reiniciar el juego...")  
+    gg.toast("Loading............ clover 1")
+    gg.processResume()
+    gg.clearResults()
+    gg.searchNumber("1600407924;51", gg.TYPE_DWORD)
+    gg.refineNumber("51", gg.TYPE_DWORD)
+
+    r = gg.getResults(1)
+    -- do something
+    local t = {}
+    t[1] = {}
+    t[1].address = r[1].address - 0xCC
+    t[1].flags = gg.TYPE_DWORD
+    t[1].value = 0
+    t[1].freeze = true
+    gg.setValues(t)
+    gg.addListItems(t)
+    -- 00000001h;6892D4F9h
+
+    local e = {}
+    e[1] = {}
+    e[1].address = r[1].address - 0x1EC
+    e[1].flags = gg.TYPE_DWORD
+    e[1].value = 0
+    e[1].freeze = true
+    gg.setValues(e)
+    gg.addListItems(e)
+
+    local y = {}
+    y[1] = {}
+    y[1].address = r[1].address - 0x30C
+    y[1].flags = gg.TYPE_DWORD
+    y[1].value = 0
+    y[1].freeze = true
+    gg.setValues(y)
+    gg.addListItems(y)
+
+    local v = {}
+    v[1] = {}
+    v[1].address = r[1].address - 0x42C
+    v[1].flags = gg.TYPE_DWORD
+    v[1].value = 0
+    v[1].freeze = true
+    gg.setValues(v)
+    gg.addListItems(v)
+
+    local h = {}
+    h[1] = {}
+    h[1].address = r[1].address - 0x54C
+    h[1].flags = gg.TYPE_DWORD
+    h[1].value = 0
+    h[1].freeze = true
+    gg.setValues(h)
+    gg.addListItems(h)
+
+    hackTrEnTrebol_2()
+end
+function hackTrEnTrebol_2()
+
+    --  gg.alert("Hacerlo mas Iniciar el juego o reiniciar el juego...") 
+    --  gg.toast( "Hacerlo mas Iniciar el juego o reiniciar el juego...")  
+    gg.toast("Loading............ clover 2")
+    -- gg.processResume()
+    -- gg.clearResults()
+    -- gg.searchNumber("1600407924;51", gg.TYPE_DWORD ) 
+    -- gg.refineNumber("51", gg.TYPE_DWORD )
+
+    r = gg.getResults(2)
+    -- do something
+    local t = {}
+    t[2] = {}
+    t[2].address = r[2].address - 0xCC
+    t[2].flags = gg.TYPE_DWORD
+    t[2].value = 0
+    t[2].freeze = true
+    gg.setValues(t)
+    gg.addListItems(t)
+    -- 00000001h;6892D4F9h
+
+    local e = {}
+    e[2] = {}
+    e[2].address = r[2].address - 0x1EC
+    e[2].flags = gg.TYPE_DWORD
+    e[2].value = 0
+    e[2].freeze = true
+    gg.setValues(e)
+    gg.addListItems(e)
+
+    local y = {}
+    y[2] = {}
+    y[2].address = r[2].address - 0x30C
+    y[2].flags = gg.TYPE_DWORD
+    y[2].value = 0
+    y[2].freeze = true
+    gg.setValues(y)
+    gg.addListItems(y)
+
+    local v = {}
+    v[2] = {}
+    v[2].address = r[2].address - 0x42C
+    v[2].flags = gg.TYPE_DWORD
+    v[2].value = 0
+    v[2].freeze = true
+    gg.setValues(v)
+    gg.addListItems(v)
+
+    local h = {}
+    h[2] = {}
+    h[2].address = r[2].address - 0x54C
+    h[2].flags = gg.TYPE_DWORD
+    h[2].value = 0
+    h[2].freeze = true
+    gg.setValues(h)
+    gg.addListItems(h)
+
+    hackTrEnTrebol_3()
+end
+function hackTrEnTrebol_3()
+
+    --  gg.alert("Hacerlo mas Iniciar el juego o reiniciar el juego...") 
+    --  gg.toast( "Hacerlo mas Iniciar el juego o reiniciar el juego...")  
+    gg.toast("Loading............ clover 3")
+    -- gg.processResume()
+    -- gg.clearResults()
+    -- gg.searchNumber("1600407924;51", gg.TYPE_DWORD ) 
+    -- gg.refineNumber("51", gg.TYPE_DWORD )
+
+    r = gg.getResults(3)
+    -- do something
+    local t = {}
+    t[3] = {}
+    t[3].address = r[3].address - 0xCC
+    t[3].flags = gg.TYPE_DWORD
+    t[3].value = 0
+    t[3].freeze = true
+    gg.setValues(t)
+    gg.addListItems(t)
+    -- 00000001h;6892D4F9h
+
+    local e = {}
+    e[3] = {}
+    e[3].address = r[3].address - 0x1EC
+    e[3].flags = gg.TYPE_DWORD
+    e[3].value = 0
+    e[3].freeze = true
+    gg.setValues(e)
+    gg.addListItems(e)
+
+    local y = {}
+    y[3] = {}
+    y[3].address = r[3].address - 0x30C
+    y[3].flags = gg.TYPE_DWORD
+    y[3].value = 0
+    y[3].freeze = true
+    gg.setValues(y)
+    gg.addListItems(y)
+
+    local v = {}
+    v[3] = {}
+    v[3].address = r[3].address - 0x42C
+    v[3].flags = gg.TYPE_DWORD
+    v[3].value = 0
+    v[3].freeze = true
+    gg.setValues(v)
+    gg.addListItems(v)
+
+    local h = {}
+    h[3] = {}
+    h[3].address = r[3].address - 0x54C
+    h[3].flags = gg.TYPE_DWORD
+    h[3].value = 0
+    h[3].freeze = true
+    gg.setValues(h)
+    gg.addListItems(h)
+
+end
+
 
 function randecor2()
     while true do

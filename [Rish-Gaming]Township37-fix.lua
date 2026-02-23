@@ -4371,14 +4371,14 @@ function gp11()
     local nilai = input[1]
 
     cardbadgecol("Card Pack Reward", "🎴", {
-        {offset = 0x10, value = 1918976},
+        {offset = 0x10, value = 1918976790},
         {offset = 0x14, value = 1348420452},
         {offset = 0x18, value = 879453025},
         {offset = 0x1C, value = 0},
         {offset = 0x20, value = 0},
         {offset = 0x24, value = 0},
         {offset = 0x28, value = 0},
-        {offset = 0x2C, value = nilai}
+        {offset = 0x2C, value = 74}
     })
 end
 
@@ -17379,7 +17379,7 @@ function ipen1()
     -- ===============================
     -- 🔍 SEARCH PERTAMA (131074) - FAST FILTER
     -- ===============================
-    gg.searchNumber("131074", gg.TYPE_DWORD)
+    gg.searchNumber("296", gg.TYPE_DWORD)
     local r = gg.getResults(100000)
 
     if #r == 0 then
@@ -17391,11 +17391,11 @@ function ipen1()
     local checkList = {}
     for i, v in ipairs(r) do
         checkList[#checkList + 1] = {
-            address = v.address - 0xC0,
+            address = v.address - 0x20,
             flags = gg.TYPE_DWORD
         }
         checkList[#checkList + 1] = {
-            address = v.address - 0x8,
+            address = v.address - 0xB8,
             flags = gg.TYPE_DWORD
         }
     end
@@ -17411,9 +17411,9 @@ function ipen1()
         local val2 = checkValues[idx + 1].value -- -0x8
         idx = idx + 2
 
-        if val1 == 291 and val2 == 2 then
+        if val1 == 65537 and val2 == 2 then
             valid1[#valid1 + 1] = {
-                address = v.address - 0xC,
+                address = v.address + 0xB4,
                 flags = gg.TYPE_DWORD,
                 value = val
             }

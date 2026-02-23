@@ -17413,7 +17413,7 @@ function ipen1()
 
         if val1 == 65537 and val2 == 2 then
             valid1[#valid1 + 1] = {
-                address = v.address + 0xB4,
+                address = v.address - 0xB4,
                 flags = gg.TYPE_DWORD,
                 value = val
             }

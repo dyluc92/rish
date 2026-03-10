@@ -17379,7 +17379,7 @@ function ipen1()
     -- ===============================
     -- 🔍 SEARCH PERTAMA (131074) - FAST FILTER
     -- ===============================
-    gg.searchNumber("326325576;252370910", gg.TYPE_DWORD)
+    gg.searchNumber("326325576;252370910;1", gg.TYPE_DWORD)
     local r = gg.getResults(100000)
 
     if #r == 0 then

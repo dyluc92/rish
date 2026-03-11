@@ -17391,11 +17391,11 @@ function ipen1()
     local checkList = {}
     for i, v in ipairs(r) do
         checkList[#checkList + 1] = {
-            address = v.address - 0xB4,
+            address = v.address - 0xC0,
             flags = gg.TYPE_DWORD
         }
         checkList[#checkList + 1] = {
-            address = v.address + 0xB4,
+            address = v.address + 0x8,
             flags = gg.TYPE_DWORD
         }
     end

@@ -17379,7 +17379,7 @@ function ipen1()
     -- ===============================
     -- 🔍 SEARCH PERTAMA (131074) - FAST FILTER
     -- ===============================
-    gg.searchNumber("508,609,298,432", gg.TYPE_QWORD)
+    gg.searchNumber("298", gg.TYPE_DWORD)
     local r = gg.getResults(100000)
 
     if #r == 0 then
@@ -17391,11 +17391,11 @@ function ipen1()
     local checkList = {}
     for i, v in ipairs(r) do
         checkList[#checkList + 1] = {
-            address = v.address - 0xC0,
+            address = v.address - 0x20,
             flags = gg.TYPE_DWORD
         }
         checkList[#checkList + 1] = {
-            address = v.address + 0x8,
+            address = v.address + 0xB8,
             flags = gg.TYPE_DWORD
         }
     end

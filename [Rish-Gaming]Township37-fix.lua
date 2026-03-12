@@ -17379,7 +17379,7 @@ function ipen1()
     -- ===============================
     -- 🔍 SEARCH PERTAMA (131074) - FAST FILTER
     -- ===============================
-    gg.searchNumber("298", gg.TYPE_DWORD)
+    gg.searchNumber("301", gg.TYPE_DWORD)
     local r = gg.getResults(100000)
 
     if #r == 0 then
@@ -17411,7 +17411,7 @@ function ipen1()
         local val2 = checkValues[idx + 1].value -- -0x8
         idx = idx + 2
 
-        if val1 == 291 and val2 == 2 then
+        if val1 == 65537 and val2 == 2 then
             valid1[#valid1 + 1] = {
                 address = v.address + 0xB4,
                 flags = gg.TYPE_DWORD,

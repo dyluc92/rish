@@ -2446,7 +2446,7 @@ function gp1(caller)
         local check = gg.getValues({
             {address = res.address + 0x48, flags = gg.TYPE_DWORD}
         })
-        if check and check[1] and check[1].value == 710 then
+        if check and check[1] and check[1].value == 720 then
             table.insert(kandidat, res)
         end
     end

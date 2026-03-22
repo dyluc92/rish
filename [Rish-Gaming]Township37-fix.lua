@@ -2446,7 +2446,7 @@ function gp1(caller)
         local check = gg.getValues({
             {address = res.address + 0x48, flags = gg.TYPE_DWORD}
         })
-        if check and check[1] and check[1].value == 720 then
+        if check and check[1] and check[1].value == 710 then
             table.insert(kandidat, res)
         end
     end
@@ -17379,7 +17379,7 @@ function ipen1()
     -- ===============================
     -- 🔍 SEARCH PERTAMA (131074) - FAST FILTER
     -- ===============================
-    gg.searchNumber("301", gg.TYPE_DWORD)
+    gg.searchNumber("306", gg.TYPE_DWORD)
     local r = gg.getResults(100000)
 
     if #r == 0 then
